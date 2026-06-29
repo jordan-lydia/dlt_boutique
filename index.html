@@ -382,6 +382,8 @@
             justify-content: center;
             align-items: center;
             position: relative;
+            flex-direction: column;
+            gap: 30px;
         }
 
         .hero-logo-display {
@@ -450,6 +452,53 @@
         @keyframes spin-slow {
             from { transform: rotate(0deg); }
             to { transform: rotate(360deg); }
+        }
+
+        /* ============================================================
+           IMAGES DE LA PAGE D'ACCUEIL
+           ============================================================ */
+        .hero-images {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+
+        .hero-images .img-wrapper {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 3px solid rgba(212, 175, 55, 0.3);
+            transition: var(--transition);
+            background: #1a1410;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: #a79e92;
+        }
+
+        .hero-images .img-wrapper:hover {
+            transform: scale(1.08);
+            border-color: var(--gold);
+            box-shadow: 0 0 30px rgba(212, 175, 55, 0.15);
+        }
+
+        .hero-images .img-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .hero-images .img-wrapper .placeholder-text {
+            text-align: center;
+            font-size: 10px;
+            letter-spacing: 1px;
+            padding: 10px;
+            text-transform: uppercase;
+            color: #a79e92;
         }
 
         /* ============================================================
@@ -1240,6 +1289,11 @@
             .hero-logo-display .big-logo {
                 font-size: 60px;
             }
+
+            .hero-images .img-wrapper {
+                width: 100px;
+                height: 100px;
+            }
         }
 
         @media (max-width: 768px) {
@@ -1309,6 +1363,11 @@
                 height: 40px;
                 font-size: 16px;
             }
+
+            .hero-images .img-wrapper {
+                width: 80px;
+                height: 80px;
+            }
         }
 
         @media (max-width: 480px) {
@@ -1355,6 +1414,15 @@
             .hero-logo-display .established {
                 font-size: 10px;
                 letter-spacing: 4px;
+            }
+
+            .hero-images .img-wrapper {
+                width: 70px;
+                height: 70px;
+            }
+
+            .hero-images {
+                gap: 12px;
             }
         }
     </style>
@@ -1430,6 +1498,19 @@
                             <span>BOUTIQUE</span>
                         </div>
                         <div class="established">KASHIPUSE · 2026</div>
+                    </div>
+                    <!-- ================================================
+                    IMAGES AJOUTÉES SUR LA PAGE D'ACCUEIL
+                    ================================================ -->
+                    <div class="hero-images">
+                        <div class="img-wrapper">
+                            <img src="logoDLT.jfif" alt="Logo DLT Boutique" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <div class="placeholder-text" style="display:none;">Logo DLT</div>
+                        </div>
+                        <div class="img-wrapper">
+                            <img src="fon.png" alt="DLT Boutique" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <div class="placeholder-text" style="display:none;">DLT Boutique</div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -2162,11 +2243,9 @@
             const shopSection = document.getElementById('shopSection');
             shopSection.classList.add('visible');
             shopVisible = true;
-            // Scroll vers la boutique
             setTimeout(() => {
                 shopSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }, 200);
-            // Mettre à jour le header
             document.querySelector('.nav-links a[data-cat="all"]')?.classList.add('active');
         }
 
@@ -2179,7 +2258,6 @@
             }
         });
 
-        // Navigation catégories (header) - montre la boutique si cachée
         document.querySelectorAll('.nav-links a[data-cat]').forEach(link => {
             link.addEventListener('click', () => {
                 if (!shopVisible) showShop();
@@ -2197,7 +2275,6 @@
         // ================================================================
         //  ÉVÉNEMENTS UI
         // ================================================================
-        // Panier
         document.getElementById('cartIcon').addEventListener('click', () => {
             document.getElementById('cartOverlay').classList.add('open');
             updateCartUI();
@@ -2206,7 +2283,6 @@
             document.getElementById('cartOverlay').classList.remove('open');
         });
 
-        // Paiement - sélection méthode
         document.querySelectorAll('.payment-method').forEach(el => {
             el.addEventListener('click', () => {
                 document.querySelectorAll('.payment-method').forEach(m => m.classList.remove('selected'));
@@ -2225,7 +2301,6 @@
             }
         });
 
-        // Header scroll effect
         window.addEventListener('scroll', () => {
             const header = document.getElementById('mainHeader');
             if (window.scrollY > 60) {
@@ -2255,18 +2330,17 @@
         renderProducts();
         updateCartUI();
 
-        // Vérifier si l'admin est déjà connecté
         if (isAdmin) {
             document.getElementById('adminDashboard').classList.add('show');
             renderAdmin();
         }
 
-        // Par défaut, la boutique est cachée, on affiche l'accueil
         console.log('👔 DLT BOUTIQUE - Luxe & Élégance');
         console.log('📦 Données stockées dans localStorage.');
         console.log('👑 Admin: admin@dlt.com / admin123');
         console.log('💳 Paiements: Airtel Money, M-Pesa, Visa, PayPal, Mastercard');
         console.log('🏠 Page d\'accueil avec logo DLT BOUTIQUE KASHIPUSE');
+        console.log('🖼️ Images: logoDLT.jfif et fon.png');
     </script>
 
 </body>
