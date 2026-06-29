@@ -24,7 +24,7 @@
             --dark-soft: #1a1a1a;
             --light-bg: #faf8f6;
             --card-shadow: 0 8px 30px rgba(0,0,0,0.08);
-            --transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            --transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             --font-serif: 'Georgia', 'Times New Roman', serif;
         }
 
@@ -131,7 +131,10 @@
             font-weight: 300;
         }
 
-        .nav-links {
+        /* ============================================================
+           MENU HAMBURGER
+           ============================================================ */
+        .nav-desktop {
             display: flex;
             gap: 22px;
             flex-wrap: wrap;
@@ -141,7 +144,7 @@
             font-weight: 400;
         }
 
-        .nav-links a {
+        .nav-desktop a {
             cursor: pointer;
             transition: var(--transition);
             padding: 4px 0;
@@ -149,7 +152,7 @@
             position: relative;
         }
 
-        .nav-links a::after {
+        .nav-desktop a::after {
             content: '';
             position: absolute;
             bottom: -2px;
@@ -160,17 +163,17 @@
             transition: var(--transition);
         }
 
-        .nav-links a:hover::after,
-        .nav-links a.active::after {
+        .nav-desktop a:hover::after,
+        .nav-desktop a.active::after {
             width: 100%;
         }
 
-        .nav-links a:hover,
-        .nav-links a.active {
+        .nav-desktop a:hover,
+        .nav-desktop a.active {
             color: var(--gold);
         }
 
-        .nav-links .admin-link {
+        .nav-desktop .admin-link {
             color: var(--gold);
             font-weight: 600;
             border: 1px solid var(--gold);
@@ -179,17 +182,198 @@
             transition: var(--transition);
         }
 
-        .nav-links .admin-link:hover {
+        .nav-desktop .admin-link:hover {
             background: var(--gold);
             color: var(--dark);
         }
 
-        .nav-links .admin-link::after { display: none; }
+        .nav-desktop .admin-link::after { display: none; }
 
+        /* Menu hamburger - bouton */
+        .hamburger-btn {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            padding: 8px 6px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            transition: var(--transition);
+            z-index: 1001;
+        }
+
+        .hamburger-btn span {
+            display: block;
+            width: 28px;
+            height: 2px;
+            background: #f0ece6;
+            border-radius: 2px;
+            transition: var(--transition);
+            transform-origin: center;
+        }
+
+        .hamburger-btn.open span:nth-child(1) {
+            transform: rotate(45deg) translate(5px, 5px);
+        }
+
+        .hamburger-btn.open span:nth-child(2) {
+            opacity: 0;
+            transform: scaleX(0);
+        }
+
+        .hamburger-btn.open span:nth-child(3) {
+            transform: rotate(-45deg) translate(5px, -5px);
+        }
+
+        .hamburger-btn:hover span {
+            background: var(--gold);
+        }
+
+        /* Menu mobile - overlay */
+        .mobile-menu-overlay {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: 100%;
+            max-width: 420px;
+            height: 100vh;
+            background: var(--dark);
+            z-index: 999;
+            transition: right 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            padding: 90px 30px 40px;
+            overflow-y: auto;
+            box-shadow: -8px 0 40px rgba(0,0,0,0.5);
+        }
+
+        .mobile-menu-overlay.open {
+            right: 0;
+        }
+
+        /* Fond sombre derrière le menu */
+        .menu-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.6);
+            z-index: 998;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.4s ease, visibility 0.4s ease;
+        }
+
+        .menu-backdrop.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Contenu du menu mobile */
+        .mobile-menu-content {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .mobile-menu-content .mobile-brand {
+            color: var(--gold);
+            font-size: 28px;
+            font-weight: 700;
+            font-family: var(--font-serif);
+            letter-spacing: 4px;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(212, 175, 55, 0.15);
+        }
+
+        .mobile-menu-content .mobile-brand small {
+            display: block;
+            font-size: 12px;
+            font-weight: 300;
+            color: #a79e92;
+            letter-spacing: 6px;
+            margin-top: 4px;
+        }
+
+        .mobile-menu-content a {
+            padding: 12px 16px;
+            color: #f0ece6;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: 400;
+            border-radius: 8px;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .mobile-menu-content a:hover {
+            background: rgba(212, 175, 55, 0.08);
+            color: var(--gold);
+            padding-left: 22px;
+        }
+
+        .mobile-menu-content a.active {
+            background: rgba(212, 175, 55, 0.12);
+            color: var(--gold);
+            border-left: 3px solid var(--gold);
+        }
+
+        .mobile-menu-content a i {
+            width: 24px;
+            color: var(--gold);
+            font-size: 16px;
+        }
+
+        .mobile-menu-content .mobile-admin-link {
+            margin-top: 20px;
+            border-top: 1px solid rgba(255,255,255,0.06);
+            padding-top: 20px;
+            color: var(--gold);
+            font-weight: 600;
+        }
+
+        .mobile-menu-content .mobile-admin-link i {
+            color: var(--gold);
+        }
+
+        .mobile-menu-footer {
+            margin-top: auto;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255,255,255,0.06);
+            color: #a79e92;
+            font-size: 12px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .mobile-menu-footer .social-icons {
+            display: flex;
+            gap: 18px;
+            margin-top: 12px;
+        }
+
+        .mobile-menu-footer .social-icons a {
+            color: #a79e92;
+            font-size: 18px;
+            transition: var(--transition);
+            padding: 0;
+        }
+
+        .mobile-menu-footer .social-icons a:hover {
+            color: var(--gold);
+        }
+
+        /* ============================================================
+           ICÔNES NAV (recherche, user, panier)
+           ============================================================ */
         .nav-icons {
             display: flex;
             gap: 18px;
             font-size: 18px;
+            align-items: center;
         }
 
         .nav-icons i {
@@ -481,7 +665,9 @@
             to { transform: rotate(360deg); }
         }
 
-        /* Indicateurs du carrousel */
+        /* ============================================================
+           CARROUSEL INDICATEURS & FLÈCHES
+           ============================================================ */
         .carousel-indicators {
             position: absolute;
             bottom: 40px;
@@ -514,7 +700,6 @@
             border-color: var(--gold);
         }
 
-        /* Flèches du carrousel */
         .carousel-arrows {
             position: absolute;
             top: 50%;
@@ -1332,18 +1517,42 @@
             .hero-logo-display .big-logo {
                 font-size: 54px;
             }
+
+            .nav-desktop {
+                display: none;
+            }
+
+            .hamburger-btn {
+                display: flex;
+            }
         }
 
         @media (max-width: 768px) {
             .header-inner {
-                flex-direction: column;
+                flex-direction: row;
                 gap: 8px;
+                flex-wrap: nowrap;
             }
 
-            .nav-links {
-                justify-content: center;
+            .logo-text .brand {
+                font-size: 16px;
+                letter-spacing: 3px;
+            }
+
+            .logo-icon {
+                width: 38px;
+                height: 38px;
+                font-size: 14px;
+            }
+
+            .logo-text .sub {
+                font-size: 8px;
+                letter-spacing: 2px;
+            }
+
+            .nav-icons {
                 gap: 12px;
-                font-size: 11px;
+                font-size: 16px;
             }
 
             .categories-grid {
@@ -1377,34 +1586,24 @@
             }
 
             .hero-logo-display {
-                width: 200px;
-                height: 200px;
+                width: 180px;
+                height: 180px;
             }
 
             .hero-logo-display .big-logo {
-                font-size: 42px;
+                font-size: 38px;
             }
 
             .hero-logo-display .big-logo span {
-                font-size: 16px;
-                letter-spacing: 8px;
+                font-size: 14px;
+                letter-spacing: 6px;
             }
 
             .btn-primary,
             .btn-secondary {
-                padding: 14px 28px;
-                font-size: 12px;
-            }
-
-            .logo-text .brand {
-                font-size: 18px;
-                letter-spacing: 4px;
-            }
-
-            .logo-icon {
-                width: 40px;
-                height: 40px;
-                font-size: 16px;
+                padding: 12px 24px;
+                font-size: 11px;
+                letter-spacing: 2px;
             }
 
             .carousel-arrows {
@@ -1415,6 +1614,11 @@
                 width: 36px;
                 height: 36px;
                 font-size: 14px;
+            }
+
+            .mobile-menu-overlay {
+                max-width: 100%;
+                padding: 80px 20px 30px;
             }
         }
 
@@ -1451,30 +1655,56 @@
             }
 
             .hero-logo-display {
-                width: 160px;
-                height: 160px;
+                width: 150px;
+                height: 150px;
             }
 
             .hero-logo-display .big-logo {
-                font-size: 34px;
+                font-size: 30px;
                 letter-spacing: 4px;
             }
 
             .hero-logo-display .big-logo span {
-                font-size: 14px;
-                letter-spacing: 6px;
+                font-size: 12px;
+                letter-spacing: 4px;
             }
 
             .hero-logo-display .established {
-                font-size: 9px;
-                letter-spacing: 4px;
-                margin-top: 12px;
-                padding-top: 10px;
+                font-size: 8px;
+                letter-spacing: 3px;
+                margin-top: 10px;
+                padding-top: 8px;
             }
 
             .carousel-indicators .dot {
-                width: 10px;
-                height: 10px;
+                width: 8px;
+                height: 8px;
+            }
+
+            .mobile-menu-content a {
+                font-size: 13px;
+                padding: 10px 14px;
+            }
+        }
+
+        /* ============================================================
+           DESKTOP > 1024px : masquer hamburger, afficher menu classique
+           ============================================================ */
+        @media (min-width: 1025px) {
+            .hamburger-btn {
+                display: none !important;
+            }
+
+            .mobile-menu-overlay {
+                display: none !important;
+            }
+
+            .menu-backdrop {
+                display: none !important;
+            }
+
+            .nav-desktop {
+                display: flex !important;
             }
         }
     </style>
@@ -1486,6 +1716,7 @@
     ============================================================ -->
     <header id="mainHeader">
         <div class="container header-inner">
+            <!-- Logo -->
             <div class="logo-wrapper">
                 <div class="logo-icon">DLT</div>
                 <div class="logo-text">
@@ -1493,7 +1724,9 @@
                     <span class="sub">KASHIPUSE · EST. 2026</span>
                 </div>
             </div>
-            <div class="nav-links">
+
+            <!-- Menu Desktop -->
+            <nav class="nav-desktop" id="navDesktop">
                 <a class="active" data-cat="all">Tous</a>
                 <a data-cat="veste">Vestes</a>
                 <a data-cat="chemise">Chemises</a>
@@ -1504,16 +1737,62 @@
                 <a data-cat="mariage">Mariage</a>
                 <a data-cat="accessoire">Accessoires</a>
                 <a class="admin-link" id="adminLoginBtn"><i class="fas fa-crown"></i> Admin</a>
-            </div>
-            <div class="nav-icons">
-                <i class="fas fa-search" title="Rechercher"></i>
-                <i class="fas fa-user" title="Mon compte"></i>
-                <i class="fas fa-shopping-bag" id="cartIcon" title="Panier">
-                    <span class="cart-badge" id="cartCount">0</span>
-                </i>
+            </nav>
+
+            <!-- Icônes + Hamburger -->
+            <div style="display:flex; align-items:center; gap:12px;">
+                <div class="nav-icons">
+                    <i class="fas fa-search" title="Rechercher"></i>
+                    <i class="fas fa-user" title="Mon compte"></i>
+                    <i class="fas fa-shopping-bag" id="cartIcon" title="Panier">
+                        <span class="cart-badge" id="cartCount">0</span>
+                    </i>
+                </div>
+                <!-- Bouton Hamburger -->
+                <button class="hamburger-btn" id="hamburgerBtn" aria-label="Menu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
             </div>
         </div>
     </header>
+
+    <!-- ============================================================
+    MENU MOBILE (Hamburger)
+    ============================================================ -->
+    <div class="menu-backdrop" id="menuBackdrop"></div>
+
+    <div class="mobile-menu-overlay" id="mobileMenu">
+        <div class="mobile-menu-content">
+            <div class="mobile-brand">
+                DLT
+                <small>BOUTIQUE · KASHIPUSE</small>
+            </div>
+
+            <a class="active" data-cat="all"><i class="fas fa-th-large"></i> Tous</a>
+            <a data-cat="veste"><i class="fas fa-jacket"></i> Vestes</a>
+            <a data-cat="chemise"><i class="fas fa-shirt"></i> Chemises</a>
+            <a data-cat="pantalon"><i class="fas fa-trousers"></i> Pantalons</a>
+            <a data-cat="polo"><i class="fas fa-tshirt"></i> Polos</a>
+            <a data-cat="culotte"><i class="fas fa-shorts"></i> Culottes</a>
+            <a data-cat="chaussure"><i class="fas fa-shoe-prints"></i> Chaussures</a>
+            <a data-cat="mariage"><i class="fas fa-ring"></i> Mariage</a>
+            <a data-cat="accessoire"><i class="fas fa-gem"></i> Accessoires</a>
+
+            <a class="mobile-admin-link" id="mobileAdminBtn"><i class="fas fa-crown"></i> Admin</a>
+
+            <div class="mobile-menu-footer">
+                <div>© 2026 DLT BOUTIQUE</div>
+                <div class="social-icons">
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-youtube"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- ============================================================
     HERO / ACCUEIL - CARROUSEL
@@ -1650,11 +1929,10 @@
     </section>
 
     <!-- ============================================================
-    SHOP SECTION (cachée par défaut)
+    SHOP SECTION
     ============================================================ -->
     <section id="shopSection">
 
-        <!-- CATÉGORIES -->
         <section class="categories-section">
             <div class="container">
                 <div class="categories-grid" id="categoriesGrid">
@@ -1663,14 +1941,12 @@
             </div>
         </section>
 
-        <!-- GALERIE PRODUITS -->
         <section class="gallery-section">
             <div class="container">
                 <div class="gallery-header">
                     <h2>Collection <span id="currentCategoryLabel">Tous</span></h2>
                     <div class="brand-filter" id="brandFilter">
                         <button class="active" data-brand="all">Toutes</button>
-                        <!-- Généré par JS -->
                     </div>
                 </div>
                 <div class="product-grid" id="productGrid">
@@ -1692,7 +1968,6 @@
         <div id="cartItems"></div>
         <div class="cart-total" id="cartTotal">Total : 0 €</div>
 
-        <!-- Paiement -->
         <div class="payment-section">
             <h5><i class="fas fa-credit-card"></i> Mode de paiement</h5>
             <div class="payment-methods" id="paymentMethods">
@@ -1730,7 +2005,6 @@
                 <button class="logout-btn" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Déconnexion</button>
             </div>
 
-            <!-- Stats -->
             <div class="admin-stats">
                 <div class="stat-card"><div class="stat-number" id="adminTotalProducts">0</div><div class="stat-label">Produits</div></div>
                 <div class="stat-card"><div class="stat-number" id="adminTotalOrders">0</div><div class="stat-label">Commandes</div></div>
@@ -1738,7 +2012,6 @@
                 <div class="stat-card"><div class="stat-number" id="adminTotalStock">0</div><div class="stat-label">Stock total</div></div>
             </div>
 
-            <!-- Notifications -->
             <div style="margin-bottom:25px;">
                 <h4 style="font-weight:300; letter-spacing:1px; margin-bottom:12px;"><i class="fas fa-bell"></i> Notifications <span class="notification-badge" id="notifCount">0</span></h4>
                 <div class="notif-list" id="notifList">
@@ -1746,7 +2019,6 @@
                 </div>
             </div>
 
-            <!-- Formulaire admin -->
             <div class="admin-form" id="adminForm">
                 <input type="hidden" id="editProductId">
                 <input type="text" id="adminProductName" placeholder="Nom du produit" required>
@@ -1761,10 +2033,10 @@
                     <option value="mariage">Mariage</option>
                     <option value="accessoire">Accessoire</option>
                 </select>
-                <input type="text" id="adminProductBrand" placeholder="Marque (ex: Armani, Hugo Boss...)" required>
+                <input type="text" id="adminProductBrand" placeholder="Marque" required>
                 <input type="number" id="adminProductPrice" placeholder="Prix (€)" required>
                 <input type="number" id="adminProductStock" placeholder="Stock" required>
-                <input type="text" id="adminProductImage" placeholder="URL image (optionnel)">
+                <input type="text" id="adminProductImage" placeholder="URL image">
                 <select id="adminProductBadge">
                     <option value="">Aucun badge</option>
                     <option value="Nouveau">Nouveau</option>
@@ -1773,10 +2045,9 @@
                     <option value="Premium">Premium</option>
                 </select>
                 <textarea id="adminProductDescription" placeholder="Description..." class="full-width"></textarea>
-                <button type="submit" class="full-width"><i class="fas fa-save"></i> Enregistrer le produit</button>
+                <button type="submit" class="full-width"><i class="fas fa-save"></i> Enregistrer</button>
             </div>
 
-            <!-- Liste produits -->
             <div class="admin-table-wrap">
                 <table>
                     <thead><tr><th>Produit</th><th>Catégorie</th><th>Marque</th><th>Prix</th><th>Stock</th><th>Actions</th></tr></thead>
@@ -1814,6 +2085,47 @@
     ============================================================ -->
     <script>
         // ================================================================
+        //  HAMBURGER MENU
+        // ================================================================
+        const hamburgerBtn = document.getElementById('hamburgerBtn');
+        const mobileMenu = document.getElementById('mobileMenu');
+        const menuBackdrop = document.getElementById('menuBackdrop');
+        const body = document.body;
+
+        function toggleMenu() {
+            const isOpen = mobileMenu.classList.toggle('open');
+            menuBackdrop.classList.toggle('show');
+            hamburgerBtn.classList.toggle('open');
+            body.style.overflow = isOpen ? 'hidden' : '';
+        }
+
+        function closeMenu() {
+            mobileMenu.classList.remove('open');
+            menuBackdrop.classList.remove('show');
+            hamburgerBtn.classList.remove('open');
+            body.style.overflow = '';
+        }
+
+        hamburgerBtn.addEventListener('click', toggleMenu);
+        menuBackdrop.addEventListener('click', closeMenu);
+
+        // Fermer le menu en cliquant sur un lien
+        document.querySelectorAll('.mobile-menu-content a').forEach(link => {
+            link.addEventListener('click', () => {
+                // Ne pas fermer si c'est le bouton Admin (il ouvrira le login)
+                if (!link.classList.contains('mobile-admin-link')) {
+                    closeMenu();
+                }
+            });
+        });
+
+        // Admin via menu mobile
+        document.getElementById('mobileAdminBtn').addEventListener('click', () => {
+            closeMenu();
+            document.getElementById('loginOverlay').classList.add('show');
+        });
+
+        // ================================================================
         //  CARROUSEL
         // ================================================================
         const slides = document.querySelectorAll('.hero-carousel .slide');
@@ -1848,7 +2160,6 @@
             startCarousel();
         }
 
-        // Événements des indicateurs
         dots.forEach((dot, index) => {
             dot.addEventListener('click', () => {
                 goToSlide(index);
@@ -1856,7 +2167,6 @@
             });
         });
 
-        // Événements des flèches
         document.getElementById('nextSlide').addEventListener('click', () => {
             nextSlide();
             resetCarousel();
@@ -1867,11 +2177,10 @@
             resetCarousel();
         });
 
-        // Démarrer le carrousel
         startCarousel();
 
         // ================================================================
-        //  DONNÉES PRINCIPALES (stockées dans localStorage)
+        //  DONNÉES PRINCIPALES
         // ================================================================
         let products = [];
         let cart = [];
@@ -1957,11 +2266,8 @@
         }
 
         function saveProducts() { localStorage.setItem(KEYS.products, JSON.stringify(products)); }
-
         function saveCart() { localStorage.setItem(KEYS.cart, JSON.stringify(cart)); }
-
         function saveOrders() { localStorage.setItem(KEYS.orders, JSON.stringify(orders)); }
-
         function saveNotifications() { localStorage.setItem(KEYS.notifications, JSON.stringify(notifications)); }
 
         // ================================================================
@@ -2013,9 +2319,12 @@
                     renderProducts();
                     document.getElementById('currentCategoryLabel').textContent =
                         labels[currentCategory] || 'Tous';
-                    document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
-                    document.querySelector(`.nav-links a[data-cat="${currentCategory}"]`)?.classList.add(
+                    document.querySelectorAll('.nav-desktop a, .mobile-menu-content a').forEach(a => a.classList
+                        .remove('active'));
+                    document.querySelector(`.nav-desktop a[data-cat="${currentCategory}"]`)?.classList.add(
                     'active');
+                    document.querySelector(`.mobile-menu-content a[data-cat="${currentCategory}"]`)?.classList
+                        .add('active');
                 });
             });
         }
@@ -2059,7 +2368,7 @@
         }
 
         // ================================================================
-        //  RENDU PRODUITS (GALERIE)
+        //  RENDU PRODUITS
         // ================================================================
         function renderProducts() {
             const grid = document.getElementById('productGrid');
@@ -2252,7 +2561,7 @@
         }
 
         // ================================================================
-        //  ADMIN : LOGIN / LOGOUT
+        //  ADMIN
         // ================================================================
         document.getElementById('adminLoginBtn').addEventListener('click', () => {
             document.getElementById('loginOverlay').classList.add('show');
@@ -2424,7 +2733,7 @@
         }
 
         // ================================================================
-        //  AFFICHAGE DE LA BOUTIQUE (toggle)
+        //  AFFICHAGE DE LA BOUTIQUE
         // ================================================================
         function showShop() {
             const shopSection = document.getElementById('shopSection');
@@ -2433,15 +2742,14 @@
             setTimeout(() => {
                 shopSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }, 200);
-            document.querySelector('.nav-links a[data-cat="all"]')?.classList.add('active');
+            document.querySelector('.nav-desktop a[data-cat="all"]')?.classList.add('active');
+            document.querySelector('.mobile-menu-content a[data-cat="all"]')?.classList.add('active');
         }
 
-        // Boutons "Voir la collection" (tous les slides)
         document.querySelectorAll('[id^="seeCollectionBtn"]').forEach(btn => {
             btn.addEventListener('click', showShop);
         });
 
-        // Boutons "Explorer" (tous les slides)
         document.querySelectorAll('[id^="scrollToShopBtn"]').forEach(btn => {
             btn.addEventListener('click', () => {
                 if (!shopVisible) {
@@ -2452,8 +2760,8 @@
             });
         });
 
-        // Navigation catégories (header)
-        document.querySelectorAll('.nav-links a[data-cat]').forEach(link => {
+        // Navigation catégories (desktop + mobile)
+        document.querySelectorAll('.nav-desktop a[data-cat], .mobile-menu-content a[data-cat]').forEach(link => {
             link.addEventListener('click', () => {
                 if (!shopVisible) showShop();
                 currentCategory = link.dataset.cat;
@@ -2461,9 +2769,14 @@
                 renderCategories();
                 renderBrands();
                 renderProducts();
-                document.getElementById('currentCategoryLabel').textContent = link.textContent;
-                document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
-                link.classList.add('active');
+                const label = link.textContent.trim();
+                document.getElementById('currentCategoryLabel').textContent = label;
+                document.querySelectorAll('.nav-desktop a, .mobile-menu-content a').forEach(a => a.classList
+                    .remove('active'));
+                document.querySelector(`.nav-desktop a[data-cat="${currentCategory}"]`)?.classList.add(
+                'active');
+                document.querySelector(`.mobile-menu-content a[data-cat="${currentCategory}"]`)?.classList
+                    .add('active');
             });
         });
 
@@ -2533,8 +2846,7 @@
         console.log('👔 DLT BOUTIQUE - Atelier Paris');
         console.log('📦 Données stockées dans localStorage.');
         console.log('👑 Admin: admin@dlt.com / admin123');
-        console.log('💳 Paiements: Airtel Money, M-Pesa, Visa, PayPal, Mastercard');
-        console.log('🖼️ Carrousel Collection Exclusive avec 3 slides');
+        console.log('🍔 Menu hamburger activé sur mobile et tablette');
     </script>
 
 </body>
