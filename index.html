@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DLT BOUTIQUE - Luxe & Élégance</title>
+    <title>DLT BOUTIQUE - Atelier Paris</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         /* ============================================================
@@ -19,36 +19,28 @@
         :root {
             --gold: #d4af37;
             --gold-light: #f0e6c8;
+            --gold-dark: #b8962a;
             --dark: #0a0a0a;
             --dark-soft: #1a1a1a;
             --light-bg: #faf8f6;
             --card-shadow: 0 8px 30px rgba(0,0,0,0.08);
-            --transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            --transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             --font-serif: 'Georgia', 'Times New Roman', serif;
         }
 
-        html {
-            scroll-behavior: smooth;
-        }
-
+        html { scroll-behavior: smooth; }
         body {
             background: var(--light-bg);
             color: #1e1e1e;
             overflow-x: hidden;
         }
-
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
-
+        .container { max-width: 1400px; margin: 0 auto; padding: 0 20px; }
         a { text-decoration: none; color: inherit; }
         button { cursor: pointer; border: none; outline: none; }
         img { max-width: 100%; display: block; }
 
         /* ============================================================
-           SCROLLBAR PERSONNALISÉE
+           SCROLLBAR
            ============================================================ */
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: var(--dark); }
@@ -226,51 +218,75 @@
         }
 
         /* ============================================================
-           HERO / ACCUEIL
+           HERO / ACCUEIL - CARROUSEL
            ============================================================ */
         .hero-section {
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: linear-gradient(135deg, var(--dark) 0%, #1a1410 50%, var(--dark) 100%);
+            background: var(--dark);
             position: relative;
             overflow: hidden;
             padding-top: 80px;
         }
 
-        .hero-section::before {
-            content: '';
+        .hero-carousel {
             position: absolute;
-            top: -50%;
-            right: -20%;
-            width: 600px;
-            height: 600px;
-            background: radial-gradient(circle, rgba(212, 175, 55, 0.08) 0%, transparent 70%);
-            border-radius: 50%;
-            pointer-events: none;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
         }
 
-        .hero-section::after {
+        .hero-carousel .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 1.5s ease-in-out;
+            background-size: cover;
+            background-position: center;
+            background-color: #0a0a0a;
+        }
+
+        .hero-carousel .slide.active {
+            opacity: 1;
+        }
+
+        .hero-carousel .slide::after {
             content: '';
             position: absolute;
-            bottom: -30%;
-            left: -10%;
-            width: 500px;
-            height: 500px;
-            background: radial-gradient(circle, rgba(212, 175, 55, 0.05) 0%, transparent 70%);
-            border-radius: 50%;
-            pointer-events: none;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(10, 10, 10, 0.85) 0%, rgba(10, 10, 10, 0.4) 60%, rgba(10, 10, 10, 0.7) 100%);
+        }
+
+        .hero-carousel .slide .slide-content {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            padding: 20px;
         }
 
         .hero-content {
+            position: relative;
+            z-index: 2;
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 60px;
             align-items: center;
             padding: 40px 0;
-            position: relative;
-            z-index: 2;
+            min-height: 80vh;
         }
 
         .hero-text {
@@ -281,42 +297,53 @@
             display: inline-block;
             background: var(--gold);
             color: var(--dark);
-            padding: 4px 20px;
+            padding: 6px 24px;
             border-radius: 30px;
             font-size: 11px;
             font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 3px;
+            letter-spacing: 4px;
             margin-bottom: 20px;
         }
 
-        .hero-text h1 {
-            font-size: 64px;
+        .hero-text .atelier {
+            font-size: 14px;
+            color: #a79e92;
+            letter-spacing: 6px;
+            text-transform: uppercase;
             font-weight: 300;
-            letter-spacing: 4px;
-            line-height: 1.1;
-            margin-bottom: 16px;
+            margin-bottom: 8px;
+        }
+
+        .hero-text h1 {
+            font-size: 72px;
+            font-weight: 300;
+            letter-spacing: 2px;
+            line-height: 1.05;
+            margin-bottom: 8px;
         }
 
         .hero-text h1 span {
             font-weight: 700;
             color: var(--gold);
             font-family: var(--font-serif);
+            display: block;
         }
 
         .hero-text .hero-subtitle {
-            font-size: 18px;
+            font-size: 22px;
             color: #a79e92;
             font-weight: 300;
-            letter-spacing: 2px;
-            margin-bottom: 8px;
+            letter-spacing: 8px;
+            text-transform: uppercase;
+            margin-bottom: 12px;
         }
 
         .hero-text .hero-description {
             font-size: 16px;
             color: #b5aba0;
             line-height: 1.8;
-            max-width: 500px;
+            max-width: 480px;
             margin: 20px 0 35px;
             font-weight: 300;
         }
@@ -333,18 +360,18 @@
         }
 
         .btn-primary {
-            padding: 16px 42px;
+            padding: 18px 48px;
             background: var(--gold);
             color: var(--dark);
             font-size: 14px;
             font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 2px;
+            letter-spacing: 3px;
             border-radius: 50px;
             transition: var(--transition);
             display: inline-flex;
             align-items: center;
-            gap: 12px;
+            gap: 14px;
             border: 2px solid var(--gold);
         }
 
@@ -352,23 +379,23 @@
             background: transparent;
             color: var(--gold);
             transform: translateY(-3px);
-            box-shadow: 0 10px 40px rgba(212, 175, 55, 0.2);
+            box-shadow: 0 10px 40px rgba(212, 175, 55, 0.25);
         }
 
         .btn-secondary {
-            padding: 16px 42px;
+            padding: 18px 48px;
             background: transparent;
             color: #f0ece6;
             font-size: 14px;
             font-weight: 600;
             text-transform: uppercase;
-            letter-spacing: 2px;
+            letter-spacing: 3px;
             border-radius: 50px;
             transition: var(--transition);
             border: 2px solid rgba(255,255,255,0.15);
             display: inline-flex;
             align-items: center;
-            gap: 12px;
+            gap: 14px;
         }
 
         .btn-secondary:hover {
@@ -381,14 +408,13 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            position: relative;
             flex-direction: column;
             gap: 30px;
         }
 
         .hero-logo-display {
-            width: 350px;
-            height: 350px;
+            width: 320px;
+            height: 320px;
             background: rgba(212, 175, 55, 0.06);
             border-radius: 50%;
             display: flex;
@@ -398,10 +424,11 @@
             border: 2px solid rgba(212, 175, 55, 0.2);
             position: relative;
             animation: pulse-glow 4s ease-in-out infinite;
+            backdrop-filter: blur(4px);
         }
 
         .hero-logo-display .big-logo {
-            font-size: 80px;
+            font-size: 72px;
             font-weight: 900;
             color: var(--gold);
             font-family: var(--font-serif);
@@ -411,7 +438,7 @@
 
         .hero-logo-display .big-logo span {
             display: block;
-            font-size: 24px;
+            font-size: 22px;
             font-weight: 300;
             letter-spacing: 12px;
             color: #a79e92;
@@ -420,7 +447,7 @@
 
         .hero-logo-display .established {
             margin-top: 18px;
-            font-size: 12px;
+            font-size: 11px;
             color: #a79e92;
             letter-spacing: 6px;
             text-transform: uppercase;
@@ -454,55 +481,77 @@
             to { transform: rotate(360deg); }
         }
 
-        /* ============================================================
-           IMAGES DE LA PAGE D'ACCUEIL
-           ============================================================ */
-        .hero-images {
+        /* Indicateurs du carrousel */
+        .carousel-indicators {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
             display: flex;
-            gap: 20px;
-            justify-content: center;
-            flex-wrap: wrap;
-            margin-top: 10px;
+            gap: 12px;
+            z-index: 10;
         }
 
-        .hero-images .img-wrapper {
-            width: 120px;
-            height: 120px;
+        .carousel-indicators .dot {
+            width: 12px;
+            height: 12px;
             border-radius: 50%;
-            overflow: hidden;
-            border: 3px solid rgba(212, 175, 55, 0.3);
+            background: rgba(255,255,255,0.25);
+            cursor: pointer;
             transition: var(--transition);
-            background: #1a1410;
+            border: 2px solid transparent;
+        }
+
+        .carousel-indicators .dot.active {
+            background: var(--gold);
+            border-color: var(--gold);
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+            transform: scale(1.2);
+        }
+
+        .carousel-indicators .dot:hover {
+            background: var(--gold);
+            border-color: var(--gold);
+        }
+
+        /* Flèches du carrousel */
+        .carousel-arrows {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 10;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            padding: 0 30px;
+            pointer-events: none;
+        }
+
+        .carousel-arrows button {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.12);
+            color: white;
+            font-size: 20px;
+            transition: var(--transition);
+            pointer-events: all;
+            backdrop-filter: blur(4px);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 12px;
-            color: #a79e92;
         }
 
-        .hero-images .img-wrapper:hover {
-            transform: scale(1.08);
+        .carousel-arrows button:hover {
+            background: var(--gold);
+            color: var(--dark);
             border-color: var(--gold);
-            box-shadow: 0 0 30px rgba(212, 175, 55, 0.15);
-        }
-
-        .hero-images .img-wrapper img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .hero-images .img-wrapper .placeholder-text {
-            text-align: center;
-            font-size: 10px;
-            letter-spacing: 1px;
-            padding: 10px;
-            text-transform: uppercase;
-            color: #a79e92;
+            transform: scale(1.1);
         }
 
         /* ============================================================
-           SECTION : BOUTIQUE (cachee par defaut)
+           SECTION : BOUTIQUE
            ============================================================ */
         #shopSection {
             display: none;
@@ -514,14 +563,8 @@
         }
 
         @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(40px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(40px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         /* ============================================================
@@ -1282,17 +1325,12 @@
             }
 
             .hero-logo-display {
-                width: 280px;
-                height: 280px;
+                width: 250px;
+                height: 250px;
             }
 
             .hero-logo-display .big-logo {
-                font-size: 60px;
-            }
-
-            .hero-images .img-wrapper {
-                width: 100px;
-                height: 100px;
+                font-size: 54px;
             }
         }
 
@@ -1330,20 +1368,25 @@
             }
 
             .hero-text h1 {
-                font-size: 36px;
+                font-size: 32px;
+            }
+
+            .hero-text .hero-subtitle {
+                font-size: 16px;
+                letter-spacing: 4px;
             }
 
             .hero-logo-display {
-                width: 220px;
-                height: 220px;
+                width: 200px;
+                height: 200px;
             }
 
             .hero-logo-display .big-logo {
-                font-size: 44px;
+                font-size: 42px;
             }
 
             .hero-logo-display .big-logo span {
-                font-size: 18px;
+                font-size: 16px;
                 letter-spacing: 8px;
             }
 
@@ -1364,9 +1407,14 @@
                 font-size: 16px;
             }
 
-            .hero-images .img-wrapper {
-                width: 80px;
-                height: 80px;
+            .carousel-arrows {
+                padding: 0 10px;
+            }
+
+            .carousel-arrows button {
+                width: 36px;
+                height: 36px;
+                font-size: 14px;
             }
         }
 
@@ -1393,17 +1441,23 @@
             }
 
             .hero-text h1 {
-                font-size: 28px;
-                letter-spacing: 2px;
+                font-size: 26px;
+                letter-spacing: 1px;
+            }
+
+            .hero-text .hero-subtitle {
+                font-size: 14px;
+                letter-spacing: 3px;
             }
 
             .hero-logo-display {
-                width: 180px;
-                height: 180px;
+                width: 160px;
+                height: 160px;
             }
 
             .hero-logo-display .big-logo {
-                font-size: 36px;
+                font-size: 34px;
+                letter-spacing: 4px;
             }
 
             .hero-logo-display .big-logo span {
@@ -1412,17 +1466,15 @@
             }
 
             .hero-logo-display .established {
-                font-size: 10px;
+                font-size: 9px;
                 letter-spacing: 4px;
+                margin-top: 12px;
+                padding-top: 10px;
             }
 
-            .hero-images .img-wrapper {
-                width: 70px;
-                height: 70px;
-            }
-
-            .hero-images {
-                gap: 12px;
+            .carousel-indicators .dot {
+                width: 10px;
+                height: 10px;
             }
         }
     </style>
@@ -1464,56 +1516,136 @@
     </header>
 
     <!-- ============================================================
-    HERO / ACCUEIL
+    HERO / ACCUEIL - CARROUSEL
     ============================================================ -->
     <section class="hero-section" id="heroSection">
-        <div class="container">
-            <div class="hero-content">
-                <div class="hero-text">
-                    <div class="hero-badge">Collection 2026</div>
-                    <h1>L'Élégance<br><span>Masculine</span> Réinventée</h1>
-                    <p class="hero-subtitle">DLT BOUTIQUE · KASHIPUSE</p>
-                    <p class="hero-description">
-                        Découvrez notre sélection <strong>Haute Gamme</strong> de vêtements pour hommes.
-                        Chaque pièce est soigneusement choisie pour incarner le <strong>luxe</strong>,
-                        le <strong>savoir-faire</strong> et l'<strong>élégance intemporelle</strong>.
-                        <br><br>
-                        <span style="color: var(--gold); font-weight: 400;">🔹 Costumes sur mesure · 🔹 Tissus nobles · 🔹 Détails d'exception</span>
-                    </p>
-                    <div class="hero-buttons">
-                        <button class="btn-primary" id="seeCollectionBtn">
-                            <i class="fas fa-arrow-right"></i> Voir la collection
-                        </button>
-                        <button class="btn-secondary" id="scrollToShopBtn">
-                            <i class="fas fa-store"></i> Explorer
-                        </button>
-                    </div>
-                </div>
-                <div class="hero-visual">
-                    <div class="hero-logo-display">
-                        <div class="ring-ornament"></div>
-                        <div class="ring-ornament"></div>
-                        <div class="big-logo">
-                            DLT
-                            <span>BOUTIQUE</span>
-                        </div>
-                        <div class="established">KASHIPUSE · 2026</div>
-                    </div>
-                    <!-- ================================================
-                    IMAGES AJOUTÉES SUR LA PAGE D'ACCUEIL
-                    ================================================ -->
-                    <div class="hero-images">
-                        <div class="img-wrapper">
-                            <img src="logoDLT.jfif" alt="Logo DLT Boutique" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                            <div class="placeholder-text" style="display:none;">Logo DLT</div>
-                        </div>
-                        <div class="img-wrapper">
-                            <img src="fon.png" alt="DLT Boutique" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                            <div class="placeholder-text" style="display:none;">DLT Boutique</div>
+        <!-- Carrousel -->
+        <div class="hero-carousel" id="heroCarousel">
+            <!-- Slide 1 -->
+            <div class="slide active" style="background-image: url('https://images.unsplash.com/photo-1617137968427-85924c800a22?w=1600&q=80');">
+                <div class="slide-content">
+                    <div class="container" style="width:100%;">
+                        <div class="hero-content" style="min-height:70vh;">
+                            <div class="hero-text">
+                                <div class="atelier">Atelier Paris</div>
+                                <h1>Collection<br><span>Exclusive</span></h1>
+                                <p class="hero-subtitle">La Boutique</p>
+                                <p class="hero-description">
+                                    Découvrez notre sélection <strong>Haute Gamme</strong> de vêtements pour hommes.
+                                    Chaque pièce est soigneusement choisie pour incarner le <strong>luxe</strong>,
+                                    le <strong>savoir-faire</strong> et l'<strong>élégance intemporelle</strong>.
+                                </p>
+                                <div class="hero-buttons">
+                                    <button class="btn-primary" id="seeCollectionBtn">
+                                        <i class="fas fa-arrow-right"></i> Voir la collection
+                                    </button>
+                                    <button class="btn-secondary" id="scrollToShopBtn">
+                                        <i class="fas fa-store"></i> Explorer
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="hero-visual">
+                                <div class="hero-logo-display">
+                                    <div class="ring-ornament"></div>
+                                    <div class="ring-ornament"></div>
+                                    <div class="big-logo">
+                                        DLT
+                                        <span>BOUTIQUE</span>
+                                    </div>
+                                    <div class="established">KASHIPUSE · 2026</div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
+            <!-- Slide 2 -->
+            <div class="slide" style="background-image: url('https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=1600&q=80');">
+                <div class="slide-content">
+                    <div class="container" style="width:100%;">
+                        <div class="hero-content" style="min-height:70vh;">
+                            <div class="hero-text">
+                                <div class="atelier">Atelier Paris</div>
+                                <h1>L'Art du<br><span>Vêtement</span></h1>
+                                <p class="hero-subtitle">Sur Mesure</p>
+                                <p class="hero-description">
+                                    Des tissus d'exception sélectionnés dans les plus grandes maisons italiennes
+                                    et anglaises. Chaque pièce est une œuvre d'art portée.
+                                </p>
+                                <div class="hero-buttons">
+                                    <button class="btn-primary" id="seeCollectionBtn2">
+                                        <i class="fas fa-arrow-right"></i> Voir la collection
+                                    </button>
+                                    <button class="btn-secondary" id="scrollToShopBtn2">
+                                        <i class="fas fa-store"></i> Explorer
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="hero-visual">
+                                <div class="hero-logo-display">
+                                    <div class="ring-ornament"></div>
+                                    <div class="ring-ornament"></div>
+                                    <div class="big-logo">
+                                        DLT
+                                        <span>BOUTIQUE</span>
+                                    </div>
+                                    <div class="established">KASHIPUSE · 2026</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Slide 3 -->
+            <div class="slide" style="background-image: url('https://images.unsplash.com/photo-1591369822096-ffd140ec948f?w=1600&q=80');">
+                <div class="slide-content">
+                    <div class="container" style="width:100%;">
+                        <div class="hero-content" style="min-height:70vh;">
+                            <div class="hero-text">
+                                <div class="atelier">Atelier Paris</div>
+                                <h1>Élégance<br><span>Intemporelle</span></h1>
+                                <p class="hero-subtitle">Depuis 2026</p>
+                                <p class="hero-description">
+                                    DLT Boutique incarne le raffinement à la française. Une signature unique
+                                    pour l'homme moderne qui recherche l'excellence.
+                                </p>
+                                <div class="hero-buttons">
+                                    <button class="btn-primary" id="seeCollectionBtn3">
+                                        <i class="fas fa-arrow-right"></i> Voir la collection
+                                    </button>
+                                    <button class="btn-secondary" id="scrollToShopBtn3">
+                                        <i class="fas fa-store"></i> Explorer
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="hero-visual">
+                                <div class="hero-logo-display">
+                                    <div class="ring-ornament"></div>
+                                    <div class="ring-ornament"></div>
+                                    <div class="big-logo">
+                                        DLT
+                                        <span>BOUTIQUE</span>
+                                    </div>
+                                    <div class="established">KASHIPUSE · 2026</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Indicateurs -->
+        <div class="carousel-indicators" id="carouselIndicators">
+            <span class="dot active" data-index="0"></span>
+            <span class="dot" data-index="1"></span>
+            <span class="dot" data-index="2"></span>
+        </div>
+
+        <!-- Flèches -->
+        <div class="carousel-arrows">
+            <button id="prevSlide"><i class="fas fa-chevron-left"></i></button>
+            <button id="nextSlide"><i class="fas fa-chevron-right"></i></button>
         </div>
     </section>
 
@@ -1668,7 +1800,7 @@
                 <a>Contact</a>
                 <a>CGV</a>
             </div>
-            <div class="copy">© 2026 DLT BOUTIQUE · Luxe & Élégance</div>
+            <div class="copy">© 2026 DLT BOUTIQUE · Atelier Paris · Collection Exclusive</div>
         </div>
     </footer>
 
@@ -1682,6 +1814,63 @@
     ============================================================ -->
     <script>
         // ================================================================
+        //  CARROUSEL
+        // ================================================================
+        const slides = document.querySelectorAll('.hero-carousel .slide');
+        const dots = document.querySelectorAll('.carousel-indicators .dot');
+        let currentSlide = 0;
+        let slideInterval;
+
+        function goToSlide(index) {
+            slides.forEach((slide, i) => {
+                slide.classList.toggle('active', i === index);
+            });
+            dots.forEach((dot, i) => {
+                dot.classList.toggle('active', i === index);
+            });
+            currentSlide = index;
+        }
+
+        function nextSlide() {
+            goToSlide((currentSlide + 1) % slides.length);
+        }
+
+        function prevSlide() {
+            goToSlide((currentSlide - 1 + slides.length) % slides.length);
+        }
+
+        function startCarousel() {
+            slideInterval = setInterval(nextSlide, 6000);
+        }
+
+        function resetCarousel() {
+            clearInterval(slideInterval);
+            startCarousel();
+        }
+
+        // Événements des indicateurs
+        dots.forEach((dot, index) => {
+            dot.addEventListener('click', () => {
+                goToSlide(index);
+                resetCarousel();
+            });
+        });
+
+        // Événements des flèches
+        document.getElementById('nextSlide').addEventListener('click', () => {
+            nextSlide();
+            resetCarousel();
+        });
+
+        document.getElementById('prevSlide').addEventListener('click', () => {
+            prevSlide();
+            resetCarousel();
+        });
+
+        // Démarrer le carrousel
+        startCarousel();
+
+        // ================================================================
         //  DONNÉES PRINCIPALES (stockées dans localStorage)
         // ================================================================
         let products = [];
@@ -1694,10 +1883,8 @@
         let isAdmin = false;
         let shopVisible = false;
 
-        // Identifiants admin (simulés)
         const ADMIN_CREDENTIALS = { email: 'admin@dlt.com', password: 'admin123' };
 
-        // Clés localStorage
         const KEYS = {
             products: 'dlt_products_v2',
             cart: 'dlt_cart_v2',
@@ -2249,15 +2436,23 @@
             document.querySelector('.nav-links a[data-cat="all"]')?.classList.add('active');
         }
 
-        document.getElementById('seeCollectionBtn').addEventListener('click', showShop);
-        document.getElementById('scrollToShopBtn').addEventListener('click', () => {
-            if (!shopVisible) {
-                showShop();
-            } else {
-                document.getElementById('shopSection').scrollIntoView({ behavior: 'smooth' });
-            }
+        // Boutons "Voir la collection" (tous les slides)
+        document.querySelectorAll('[id^="seeCollectionBtn"]').forEach(btn => {
+            btn.addEventListener('click', showShop);
         });
 
+        // Boutons "Explorer" (tous les slides)
+        document.querySelectorAll('[id^="scrollToShopBtn"]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                if (!shopVisible) {
+                    showShop();
+                } else {
+                    document.getElementById('shopSection').scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+
+        // Navigation catégories (header)
         document.querySelectorAll('.nav-links a[data-cat]').forEach(link => {
             link.addEventListener('click', () => {
                 if (!shopVisible) showShop();
@@ -2335,12 +2530,11 @@
             renderAdmin();
         }
 
-        console.log('👔 DLT BOUTIQUE - Luxe & Élégance');
+        console.log('👔 DLT BOUTIQUE - Atelier Paris');
         console.log('📦 Données stockées dans localStorage.');
         console.log('👑 Admin: admin@dlt.com / admin123');
         console.log('💳 Paiements: Airtel Money, M-Pesa, Visa, PayPal, Mastercard');
-        console.log('🏠 Page d\'accueil avec logo DLT BOUTIQUE KASHIPUSE');
-        console.log('🖼️ Images: logoDLT.jfif et fon.png');
+        console.log('🖼️ Carrousel Collection Exclusive avec 3 slides');
     </script>
 
 </body>
