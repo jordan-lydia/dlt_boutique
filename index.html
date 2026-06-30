@@ -5,6 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DLT BOUTIQUE - Atelier Paris</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <style>
         /* ============================================================
            RESET & VARIABLES
@@ -26,6 +31,8 @@
             --card-shadow: 0 8px 30px rgba(0,0,0,0.08);
             --transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             --font-serif: 'Georgia', 'Times New Roman', serif;
+            --danger: #c0392b;
+            --success: #27ae60;
         }
 
         html { scroll-behavior: smooth; }
@@ -367,7 +374,7 @@
         }
 
         /* ============================================================
-           ICÔNES NAV (recherche, user, panier)
+           ICÔNES NAV
            ============================================================ */
         .nav-icons {
             display: flex;
@@ -1335,6 +1342,63 @@
 
         .admin-form textarea { resize: vertical; min-height: 60px; }
 
+        .admin-form .file-upload-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .admin-form .file-upload-wrapper input[type="file"] {
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        .admin-form .file-upload-label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 16px;
+            background: #faf8f6;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 14px;
+            color: #888;
+        }
+
+        .admin-form .file-upload-label:hover {
+            border-color: var(--gold);
+            background: #fcf9f2;
+        }
+
+        .admin-form .file-upload-label i {
+            color: var(--gold);
+            font-size: 18px;
+        }
+
+        .admin-form .image-preview {
+            margin-top: 10px;
+            max-width: 150px;
+            max-height: 150px;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 2px solid #eee;
+            display: none;
+        }
+
+        .admin-form .image-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
         .admin-form button {
             background: var(--dark);
             color: white;
@@ -1348,6 +1412,11 @@
         .admin-form button:hover {
             background: var(--gold);
             color: var(--dark);
+        }
+
+        .admin-form button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
         }
 
         .admin-table-wrap {
@@ -1489,6 +1558,23 @@
         }
 
         .footer .footer-brand span { color: var(--gold); }
+
+        /* ============================================================
+           LOADING SPINNER
+           ============================================================ */
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 0.8s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
 
         /* ============================================================
            RESPONSIVE
@@ -1729,7 +1815,7 @@
                 <div class="logo-icon">DLT</div>
                 <div class="logo-text">
                     <span class="brand"><span>DLT</span> BOUTIQUE</span>
-                    <span class="sub">KASHIPUSE ·</span>
+                    <span class="sub">KASHIPUSE · EST. 2026</span>
                 </div>
             </div>
 
@@ -1806,584 +1892,12 @@
     HERO / ACCUEIL - CARROUSEL (15 images)
     ============================================================ -->
     <section class="hero-section" id="heroSection">
-        <!-- Carrousel -->
         <div class="hero-carousel" id="heroCarousel">
-            <!-- Slide 1 -->
-            <div class="slide active" style="background-image: url('carrousel (1).jpg');">
-                <div class="slide-content">
-                    <div class="container" style="width:100%;">
-                        <div class="hero-content" style="min-height:70vh;">
-                            <div class="hero-text">
-                                <div class="atelier"></div>
-                                <h1>Collection<br><span> D'exclusive</span></h1>
-                                <p class="hero-subtitle">La Boutique</p>
-                                <p class="hero-description">
-                                    Découvrez notre sélection <strong>Haute Gamme</strong> de vêtements pour hommes.
-                                    Chaque pièce est soigneusement choisie pour incarner le <strong>luxe</strong>,
-                                    le <strong>savoir-faire</strong> et l'<strong>élégance intemporelle</strong>.
-                                </p>
-                                <div class="hero-buttons">
-                                    <button class="btn-primary" id="seeCollectionBtn">
-                                        <i class="fas fa-arrow-right"></i> Voir la collection
-                                    </button>
-                                    <button class="btn-secondary" id="scrollToShopBtn">
-                                        <i class="fas fa-store"></i> Explorer
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="hero-visual">
-                                <div class="hero-logo-display">
-                                    <div class="ring-ornament"></div>
-                                    <div class="ring-ornament"></div>
-                                    <div class="big-logo">
-                                        DLT
-                                        <span>BOUTIQUE</span>
-                                    </div>
-                                    <div class="established">KASHIPUSE · 2026</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>  
-            
-            <div class="slide" style="background-image: url('carrousel (1).jpg');">
-                <div class="slide-content">
-                    <div class="container" style="width:100%;">
-                        <div class="hero-content" style="min-height:70vh;">
-                            <div class="hero-text">
-                                <div class="atelier">Atelier Paris </div>
-                                <h1>L'Art du<br><span>Vêtement</span></h1>
-                                <p class="hero-subtitle">Sur Mesure</p>
-                                <p class="hero-description">
-                                    Des tissus d'exception sélectionnés dans les plus grandes maisons italiennes
-                                    et anglaises. Chaque pièce est une œuvre d'art portée.
-                                </p>
-                                <div class="hero-buttons">
-                                    <button class="btn-primary" id="seeCollectionBtn2">
-                                        <i class="fas fa-arrow-right"></i> Voir la collection
-                                    </button>
-                                    <button class="btn-secondary" id="scrollToShopBtn2">
-                                        <i class="fas fa-store"></i> Explorer
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="hero-visual">
-                                <div class="hero-logo-display">
-                                    <div class="ring-ornament"></div>
-                                    <div class="ring-ornament"></div>
-                                    <div class="big-logo">
-                                        DLT
-                                        <span>BOUTIQUE</span>
-                                    </div>
-                                    <div class="established">KASHIPUSE · 2026</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- Slide 3 -->
-            <div class="slide" style="background-image: url('carrousel (3).jpeg');">
-                <div class="slide-content">
-                    <div class="container" style="width:100%;">
-                        <div class="hero-content" style="min-height:70vh;">
-                            <div class="hero-text">
-                                <div class="atelier">Atelier Paris</div>
-                                <h1>Style<br><span>Authentique</span></h1>
-                                <p class="hero-subtitle">L'Excellence</p>
-                                <p class="hero-description">
-                                    Des pièces uniques qui racontent une histoire. Chaque vêtement est conçu
-                                    pour l'homme qui ose se démarquer avec <strong>élégance</strong>.
-                                </p>
-                                <div class="hero-buttons">
-                                    <button class="btn-primary" id="seeCollectionBtn3">
-                                        <i class="fas fa-arrow-right"></i> Voir la collection
-                                    </button>
-                                    <button class="btn-secondary" id="scrollToShopBtn3">
-                                        <i class="fas fa-store"></i> Explorer
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="hero-visual">
-                                <div class="hero-logo-display">
-                                    <div class="ring-ornament"></div>
-                                    <div class="ring-ornament"></div>
-                                    <div class="big-logo">
-                                        DLT
-                                        <span>BOUTIQUE</span>
-                                    </div>
-                                    <div class="established">KASHIPUSE · 2026</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- Slide 4 -->
-            <div class="slide" style="background-image: url('carrousel (4).jpeg');">
-                <div class="slide-content">
-                    <div class="container" style="width:100%;">
-                        <div class="hero-content" style="min-height:70vh;">
-                            <div class="hero-text">
-                                <div class="atelier">Atelier Paris</div>
-                                <h1>Luxe<br><span>Moderne</span></h1>
-                                <p class="hero-subtitle">L'Élégance</p>
-                                <p class="hero-description">
-                                    Alliez le raffinement traditionnel à une coupe contemporaine.
-                                    Découvrez des vêtements qui subliment <strong>votre silhouette</strong>.
-                                </p>
-                                <div class="hero-buttons">
-                                    <button class="btn-primary" id="seeCollectionBtn4">
-                                        <i class="fas fa-arrow-right"></i> Voir la collection
-                                    </button>
-                                    <button class="btn-secondary" id="scrollToShopBtn4">
-                                        <i class="fas fa-store"></i> Explorer
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="hero-visual">
-                                <div class="hero-logo-display">
-                                    <div class="ring-ornament"></div>
-                                    <div class="ring-ornament"></div>
-                                    <div class="big-logo">
-                                        DLT
-                                        <span>BOUTIQUE</span>
-                                    </div>
-                                    <div class="established">KASHIPUSE · 2026</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- Slide 5 -->
-            <div class="slide" style="background-image: url('carrousel (5).jpeg');">
-                <div class="slide-content">
-                    <div class="container" style="width:100%;">
-                        <div class="hero-content" style="min-height:70vh;">
-                            <div class="hero-text">
-                                <div class="atelier">Atelier Paris</div>
-                                <h1>Élégance<br><span>Intemporelle</span></h1>
-                                <p class="hero-subtitle">Depuis 2026</p>
-                                <p class="hero-description">
-                                    DLT Boutique incarne le raffinement à la française. Une signature unique
-                                    pour l'homme moderne qui recherche l'excellence.
-                                </p>
-                                <div class="hero-buttons">
-                                    <button class="btn-primary" id="seeCollectionBtn5">
-                                        <i class="fas fa-arrow-right"></i> Voir la collection
-                                    </button>
-                                    <button class="btn-secondary" id="scrollToShopBtn5">
-                                        <i class="fas fa-store"></i> Explorer
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="hero-visual">
-                                <div class="hero-logo-display">
-                                    <div class="ring-ornament"></div>
-                                    <div class="ring-ornament"></div>
-                                    <div class="big-logo">
-                                        DLT
-                                        <span>BOUTIQUE</span>
-                                    </div>
-                                    <div class="established">KASHIPUSE · 2026</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- Slide 6 -->
-            <div class="slide" style="background-image: url('carrousel (6).jpeg');">
-                <div class="slide-content">
-                    <div class="container" style="width:100%;">
-                        <div class="hero-content" style="min-height:70vh;">
-                            <div class="hero-text">
-                                <div class="atelier">Atelier Paris</div>
-                                <h1>L'Art du<br><span>Détail</span></h1>
-                                <p class="hero-subtitle">La Perfection</p>
-                                <p class="hero-description">
-                                    Chaque couture, chaque bouton, chaque tissu est choisi avec une
-                                    <strong>précision</strong> digne des plus grandes maisons.
-                                </p>
-                                <div class="hero-buttons">
-                                    <button class="btn-primary" id="seeCollectionBtn6">
-                                        <i class="fas fa-arrow-right"></i> Voir la collection
-                                    </button>
-                                    <button class="btn-secondary" id="scrollToShopBtn6">
-                                        <i class="fas fa-store"></i> Explorer
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="hero-visual">
-                                <div class="hero-logo-display">
-                                    <div class="ring-ornament"></div>
-                                    <div class="ring-ornament"></div>
-                                    <div class="big-logo">
-                                        DLT
-                                        <span>BOUTIQUE</span>
-                                    </div>
-                                    <div class="established">KASHIPUSE · 2026</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- Slide 7 -->
-            <div class="slide" style="background-image: url('carrousel (7).jpeg');">
-                <div class="slide-content">
-                    <div class="container" style="width:100%;">
-                        <div class="hero-content" style="min-height:70vh;">
-                            <div class="hero-text">
-                                <div class="atelier">Atelier Paris</div>
-                                <h1>Style<br><span>Parisien</span></h1>
-                                <p class="hero-subtitle">L'Élégance</p>
-                                <p class="hero-description">
-                                    Inspiré des plus grandes silhouettes parisiennes, notre collection
-                                    allie <strong>modernité</strong> et <strong>tradition</strong>.
-                                </p>
-                                <div class="hero-buttons">
-                                    <button class="btn-primary" id="seeCollectionBtn7">
-                                        <i class="fas fa-arrow-right"></i> Voir la collection
-                                    </button>
-                                    <button class="btn-secondary" id="scrollToShopBtn7">
-                                        <i class="fas fa-store"></i> Explorer
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="hero-visual">
-                                <div class="hero-logo-display">
-                                    <div class="ring-ornament"></div>
-                                    <div class="ring-ornament"></div>
-                                    <div class="big-logo">
-                                        DLT
-                                        <span>BOUTIQUE</span>
-                                    </div>
-                                    <div class="established">KASHIPUSE · 2026</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- Slide 8 -->
-            <div class="slide" style="background-image: url('carrousel (8).jpeg');">
-                <div class="slide-content">
-                    <div class="container" style="width:100%;">
-                        <div class="hero-content" style="min-height:70vh;">
-                            <div class="hero-text">
-                                <div class="atelier">Atelier Paris</div>
-                                <h1>Luxe<br><span>Responsable</span></h1>
-                                <p class="hero-subtitle">L'Éthique</p>
-                                <p class="hero-description">
-                                    Des matières nobles et durables, sélectionnées avec soin pour
-                                    un <strong>élégance</strong> qui respecte la planète.
-                                </p>
-                                <div class="hero-buttons">
-                                    <button class="btn-primary" id="seeCollectionBtn8">
-                                        <i class="fas fa-arrow-right"></i> Voir la collection
-                                    </button>
-                                    <button class="btn-secondary" id="scrollToShopBtn8">
-                                        <i class="fas fa-store"></i> Explorer
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="hero-visual">
-                                <div class="hero-logo-display">
-                                    <div class="ring-ornament"></div>
-                                    <div class="ring-ornament"></div>
-                                    <div class="big-logo">
-                                        DLT
-                                        <span>BOUTIQUE</span>
-                                    </div>
-                                    <div class="established">KASHIPUSE · 2026</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- Slide 9 -->
-            <div class="slide" style="background-image: url('carrousel (9).jpeg');">
-                <div class="slide-content">
-                    <div class="container" style="width:100%;">
-                        <div class="hero-content" style="min-height:70vh;">
-                            <div class="hero-text">
-                                <div class="atelier">Atelier Paris</div>
-                                <h1>L'Art<br><span>du Sur-Mesure</span></h1>
-                                <p class="hero-subtitle">L'Excellence</p>
-                                <p class="hero-description">
-                                    Des vêtements conçus pour vous, avec une <strong>attention</strong>
-                                    particulière à chaque détail pour une silhouette parfaite.
-                                </p>
-                                <div class="hero-buttons">
-                                    <button class="btn-primary" id="seeCollectionBtn9">
-                                        <i class="fas fa-arrow-right"></i> Voir la collection
-                                    </button>
-                                    <button class="btn-secondary" id="scrollToShopBtn9">
-                                        <i class="fas fa-store"></i> Explorer
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="hero-visual">
-                                <div class="hero-logo-display">
-                                    <div class="ring-ornament"></div>
-                                    <div class="ring-ornament"></div>
-                                    <div class="big-logo">
-                                        DLT
-                                        <span>BOUTIQUE</span>
-                                    </div>
-                                    <div class="established">KASHIPUSE · 2026</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- Slide 10 -->
-            <div class="slide" style="background-image: url('carrousel (10).jpeg');">
-                <div class="slide-content">
-                    <div class="container" style="width:100%;">
-                        <div class="hero-content" style="min-height:70vh;">
-                            <div class="hero-text">
-                                <div class="atelier">Atelier Paris</div>
-                                <h1>Élégance<br><span>Moderne</span></h1>
-                                <p class="hero-subtitle">Le Style</p>
-                                <p class="hero-description">
-                                    Une vision contemporaine du luxe, où chaque pièce est conçue
-                                    pour <strong>sublimer</strong> l'homme d'aujourd'hui.
-                                </p>
-                                <div class="hero-buttons">
-                                    <button class="btn-primary" id="seeCollectionBtn10">
-                                        <i class="fas fa-arrow-right"></i> Voir la collection
-                                    </button>
-                                    <button class="btn-secondary" id="scrollToShopBtn10">
-                                        <i class="fas fa-store"></i> Explorer
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="hero-visual">
-                                <div class="hero-logo-display">
-                                    <div class="ring-ornament"></div>
-                                    <div class="ring-ornament"></div>
-                                    <div class="big-logo">
-                                        DLT
-                                        <span>BOUTIQUE</span>
-                                    </div>
-                                    <div class="established">KASHIPUSE · 2026</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- Slide 11 -->
-            <div class="slide" style="background-image: url('carrousel (11).jpeg');">
-                <div class="slide-content">
-                    <div class="container" style="width:100%;">
-                        <div class="hero-content" style="min-height:70vh;">
-                            <div class="hero-text">
-                                <div class="atelier">Atelier Paris</div>
-                                <h1>Collection<br><span>Privée</span></h1>
-                                <p class="hero-subtitle">L'Exclusivité</p>
-                                <p class="hero-description">
-                                    Une sélection limitée de pièces <strong>uniques</strong>,
-                                    conçues pour ceux qui recherchent l'exception.
-                                </p>
-                                <div class="hero-buttons">
-                                    <button class="btn-primary" id="seeCollectionBtn11">
-                                        <i class="fas fa-arrow-right"></i> Voir la collection
-                                    </button>
-                                    <button class="btn-secondary" id="scrollToShopBtn11">
-                                        <i class="fas fa-store"></i> Explorer
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="hero-visual">
-                                <div class="hero-logo-display">
-                                    <div class="ring-ornament"></div>
-                                    <div class="ring-ornament"></div>
-                                    <div class="big-logo">
-                                        DLT
-                                        <span>BOUTIQUE</span>
-                                    </div>
-                                    <div class="established">KASHIPUSE · 2026</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- Slide 12 -->
-            <div class="slide" style="background-image: url('carrousel (12).jpeg');">
-                <div class="slide-content">
-                    <div class="container" style="width:100%;">
-                        <div class="hero-content" style="min-height:70vh;">
-                            <div class="hero-text">
-                                <div class="atelier">Atelier Paris</div>
-                                <h1>L'Art de<br><span>Vivre</span></h1>
-                                <p class="hero-subtitle">L'Élégance</p>
-                                <p class="hero-description">
-                                    Plus qu'un vêtement, une <strong>philosophie</strong>.
-                                    L'élégance est un art de vivre que nous cultivons.
-                                </p>
-                                <div class="hero-buttons">
-                                    <button class="btn-primary" id="seeCollectionBtn12">
-                                        <i class="fas fa-arrow-right"></i> Voir la collection
-                                    </button>
-                                    <button class="btn-secondary" id="scrollToShopBtn12">
-                                        <i class="fas fa-store"></i> Explorer
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="hero-visual">
-                                <div class="hero-logo-display">
-                                    <div class="ring-ornament"></div>
-                                    <div class="ring-ornament"></div>
-                                    <div class="big-logo">
-                                        DLT
-                                        <span>BOUTIQUE</span>
-                                    </div>
-                                    <div class="established">KASHIPUSE · 2026</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- Slide 13 -->
-            <div class="slide" style="background-image: url('carrousel (13).jpeg');">
-                <div class="slide-content">
-                    <div class="container" style="width:100%;">
-                        <div class="hero-content" style="min-height:70vh;">
-                            <div class="hero-text">
-                                <div class="atelier">Atelier Paris</div>
-                                <h1>Style<br><span>Distingué</span></h1>
-                                <p class="hero-subtitle">La Classe</p>
-                                <p class="hero-description">
-                                    Des pièces qui parlent d'<strong>élégance</strong> sans jamais
-                                    en faire trop. Le luxe dans la sobriété.
-                                </p>
-                                <div class="hero-buttons">
-                                    <button class="btn-primary" id="seeCollectionBtn13">
-                                        <i class="fas fa-arrow-right"></i> Voir la collection
-                                    </button>
-                                    <button class="btn-secondary" id="scrollToShopBtn13">
-                                        <i class="fas fa-store"></i> Explorer
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="hero-visual">
-                                <div class="hero-logo-display">
-                                    <div class="ring-ornament"></div>
-                                    <div class="ring-ornament"></div>
-                                    <div class="big-logo">
-                                        DLT
-                                        <span>BOUTIQUE</span>
-                                    </div>
-                                    <div class="established">KASHIPUSE · 2026</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- Slide 14 -->
-            <div class="slide" style="background-image: url('carrousel (14).jpeg');">
-                <div class="slide-content">
-                    <div class="container" style="width:100%;">
-                        <div class="hero-content" style="min-height:70vh;">
-                            <div class="hero-text">
-                                <div class="atelier">Atelier Paris</div>
-                                <h1>Luxe<br><span>Authentique</span></h1>
-                                <p class="hero-subtitle">L'Excellence</p>
-                                <p class="hero-description">
-                                    Le véritable luxe est dans l'<strong>authenticité</strong>
-                                    des matières et la qualité des finitions.
-                                </p>
-                                <div class="hero-buttons">
-                                    <button class="btn-primary" id="seeCollectionBtn14">
-                                        <i class="fas fa-arrow-right"></i> Voir la collection
-                                    </button>
-                                    <button class="btn-secondary" id="scrollToShopBtn14">
-                                        <i class="fas fa-store"></i> Explorer
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="hero-visual">
-                                <div class="hero-logo-display">
-                                    <div class="ring-ornament"></div>
-                                    <div class="ring-ornament"></div>
-                                    <div class="big-logo">
-                                        DLT
-                                        <span>BOUTIQUE</span>
-                                    </div>
-                                    <div class="established">KASHIPUSE · 2026</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- Slide 15 -->
-            <div class="slide" style="background-image: url('carrousel (15).jpeg');">
-                <div class="slide-content">
-                    <div class="container" style="width:100%;">
-                        <div class="hero-content" style="min-height:70vh;">
-                            <div class="hero-text">
-                                <div class="atelier">Atelier Paris</div>
-                                <h1>Élégance<br><span>Éternelle</span></h1>
-                                <p class="hero-subtitle">La Signature</p>
-                                <p class="hero-description">
-                                    DLT Boutique, une <strong>signature</strong> unique pour
-                                    l'homme qui cherche l'excellence et l'éternel.
-                                </p>
-                                <div class="hero-buttons">
-                                    <button class="btn-primary" id="seeCollectionBtn15">
-                                        <i class="fas fa-arrow-right"></i> Voir la collection
-                                    </button>
-                                    <button class="btn-secondary" id="scrollToShopBtn15">
-                                        <i class="fas fa-store"></i> Explorer
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="hero-visual">
-                                <div class="hero-logo-display">
-                                    <div class="ring-ornament"></div>
-                                    <div class="ring-ornament"></div>
-                                    <div class="big-logo">
-                                        DLT
-                                        <span>BOUTIQUE</span>
-                                    </div>
-                                    <div class="established">KASHIPUSE · 2026</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <!-- Slides générés par JavaScript -->
         </div>
 
-        <!-- Indicateurs (15 dots) -->
-        <div class="carousel-indicators" id="carouselIndicators">
-            <span class="dot active" data-index="0"></span>
-            <span class="dot" data-index="1"></span>
-            <span class="dot" data-index="2"></span>
-            <span class="dot" data-index="3"></span>
-            <span class="dot" data-index="4"></span>
-            <span class="dot" data-index="5"></span>
-            <span class="dot" data-index="6"></span>
-            <span class="dot" data-index="7"></span>
-            <span class="dot" data-index="8"></span>
-            <span class="dot" data-index="9"></span>
-            <span class="dot" data-index="10"></span>
-            <span class="dot" data-index="11"></span>
-            <span class="dot" data-index="12"></span>
-            <span class="dot" data-index="13"></span>
-            <span class="dot" data-index="14"></span>
-        </div>
+        <!-- Indicateurs -->
+        <div class="carousel-indicators" id="carouselIndicators"></div>
 
         <!-- Flèches -->
         <div class="carousel-arrows">
@@ -2430,7 +1944,7 @@
             <span class="close-cart" id="closeCart">&times;</span>
         </div>
         <div id="cartItems"></div>
-        <div class="cart-total" id="cartTotal">Total : 0 €</div>
+        <div class="cart-total" id="cartTotal">Total : 0 $</div>
 
         <div class="payment-section">
             <h5><i class="fas fa-credit-card"></i> Mode de paiement</h5>
@@ -2440,6 +1954,7 @@
                 <div class="payment-method" data-method="visa"><i class="fab fa-cc-visa"></i> Visa</div>
                 <div class="payment-method" data-method="paypal"><i class="fab fa-paypal"></i> PayPal</div>
                 <div class="payment-method" data-method="mastercard"><i class="fab fa-cc-mastercard"></i> Mastercard</div>
+                <div class="payment-method" data-method="orange"><i class="fas fa-mobile-alt"></i> Orange Money</div>
             </div>
             <button class="pay-btn" id="payBtn"><i class="fas fa-check-circle"></i> Payer maintenant</button>
         </div>
@@ -2452,7 +1967,7 @@
         <div class="login-box">
             <h2><span>DLT</span> Admin</h2>
             <p>Connectez-vous pour gérer votre boutique</p>
-            <input type="text" id="loginEmail" placeholder="Email administrateur" value="admin@dlt.com">
+            <input type="email" id="loginEmail" placeholder="Email administrateur" value="admin@dlt.com">
             <input type="password" id="loginPassword" placeholder="Mot de passe" value="admin123">
             <button class="login-btn" id="loginBtn"><i class="fas fa-sign-in-alt"></i> Se connecter</button>
             <div class="error-msg" id="loginError">Identifiants incorrects</div>
@@ -2472,7 +1987,7 @@
             <div class="admin-stats">
                 <div class="stat-card"><div class="stat-number" id="adminTotalProducts">0</div><div class="stat-label">Produits</div></div>
                 <div class="stat-card"><div class="stat-number" id="adminTotalOrders">0</div><div class="stat-label">Commandes</div></div>
-                <div class="stat-card"><div class="stat-number" id="adminTotalRevenue">0 €</div><div class="stat-label">Chiffre d'affaires</div></div>
+                <div class="stat-card"><div class="stat-number" id="adminTotalRevenue">0 $</div><div class="stat-label">Chiffre d'affaires</div></div>
                 <div class="stat-card"><div class="stat-number" id="adminTotalStock">0</div><div class="stat-label">Stock total</div></div>
             </div>
 
@@ -2497,10 +2012,23 @@
                     <option value="mariage">Mariage</option>
                     <option value="accessoire">Accessoire</option>
                 </select>
-                <input type="text" id="adminProductBrand" placeholder="Marque" required>
-                <input type="number" id="adminProductPrice" placeholder="Prix (€)" required>
+                <input type="text" id="adminProductBrand" placeholder="Marque (ex: Armani, Hugo Boss...)" required>
+                <input type="number" id="adminProductPrice" placeholder="Prix (USD)" step="0.01" required>
                 <input type="number" id="adminProductStock" placeholder="Stock" required>
-                <input type="text" id="adminProductImage" placeholder="URL image">
+                
+                <div class="full-width">
+                    <div class="file-upload-wrapper">
+                        <div class="file-upload-label">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <span id="fileLabel">Choisir une image</span>
+                            <input type="file" id="adminProductImage" accept="image/*">
+                        </div>
+                    </div>
+                    <div class="image-preview" id="imagePreview">
+                        <img id="previewImg" src="" alt="Aperçu">
+                    </div>
+                </div>
+
                 <select id="adminProductBadge">
                     <option value="">Aucun badge</option>
                     <option value="Nouveau">Nouveau</option>
@@ -2509,7 +2037,7 @@
                     <option value="Premium">Premium</option>
                 </select>
                 <textarea id="adminProductDescription" placeholder="Description..." class="full-width"></textarea>
-                <button type="submit" class="full-width"><i class="fas fa-save"></i> Enregistrer</button>
+                <button type="submit" class="full-width" id="adminSubmitBtn"><i class="fas fa-save"></i> Enregistrer le produit</button>
             </div>
 
             <div class="admin-table-wrap">
@@ -2545,15 +2073,130 @@
     <div class="flash-message" id="flashMessage"></div>
 
     <!-- ============================================================
-    JAVASCRIPT
+    JAVASCRIPT - FIREBASE & APPLICATION
     ============================================================ -->
     <script>
         // ================================================================
+        //  CONFIGURATION FIREBASE
+        // ================================================================
+        const firebaseConfig = {
+            apiKey: "AIzaSyAXjjfFB74BZ4uPYDrZ6T6c-I91bvszxWc",
+            authDomain: "dlt-boutique.firebaseapp.com",
+            projectId: "dlt-boutique",
+            storageBucket: "dlt-boutique.firebasestorage.app",
+            messagingSenderId: "573039187938",
+            appId: "1:573039187938:web:a7b49798d649ca67764bbb",
+            measurementId: "G-S6TP863VWR"
+        };
+
+        // Initialisation Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const storage = firebase.storage();
+        const auth = firebase.auth();
+
+        // ================================================================
+        //  ÉTAT DE L'APPLICATION
+        // ================================================================
+        let products = [];
+        let cart = [];
+        let orders = [];
+        let notifications = [];
+        let currentCategory = 'all';
+        let currentBrand = 'all';
+        let selectedPayment = 'airtel';
+        let isAdmin = false;
+        let shopVisible = false;
+        let currentUser = null;
+        let selectedFile = null;
+
+        // ================================================================
+        //  RÉFÉRENCES DOM
+        // ================================================================
+        const $ = (id) => document.getElementById(id);
+        const flashMsg = $('flashMessage');
+
+        // ================================================================
+        //  AUTHENTIFICATION
+        // ================================================================
+        auth.onAuthStateChanged(async (user) => {
+            if (user) {
+                currentUser = user;
+                // Vérifier si l'utilisateur est admin (via une collection admins)
+                try {
+                    const adminDoc = await db.collection('admins').doc(user.uid).get();
+                    if (adminDoc.exists) {
+                        isAdmin = true;
+                        $('adminDashboard').classList.add('show');
+                        renderAdmin();
+                        showFlash('👑 Bienvenue dans l\'espace administrateur.', 2000);
+                    } else {
+                        isAdmin = false;
+                        showFlash('⚠️ Vous n\'avez pas les droits d\'administration.', 2000);
+                    }
+                } catch (error) {
+                    console.error('Erreur vérification admin:', error);
+                    isAdmin = false;
+                }
+            } else {
+                currentUser = null;
+                isAdmin = false;
+                $('adminDashboard').classList.remove('show');
+            }
+            // Cacher le login
+            $('loginOverlay').classList.remove('show');
+        });
+
+        // Login
+        $('loginBtn').addEventListener('click', async () => {
+            const email = $('loginEmail').value.trim();
+            const password = $('loginPassword').value.trim();
+            const errorEl = $('loginError');
+
+            try {
+                await auth.signInWithEmailAndPassword(email, password);
+                errorEl.style.display = 'none';
+            } catch (error) {
+                errorEl.textContent = '❌ ' + error.message;
+                errorEl.style.display = 'block';
+                setTimeout(() => errorEl.style.display = 'none', 4000);
+            }
+        });
+
+        // Logout
+        $('logoutBtn').addEventListener('click', async () => {
+            try {
+                await auth.signOut();
+                isAdmin = false;
+                $('adminDashboard').classList.remove('show');
+                showFlash('👋 Déconnexion réussie.', 1500);
+            } catch (error) {
+                showFlash('❌ Erreur lors de la déconnexion.', 2000);
+            }
+        });
+
+        // Ouverture login
+        $('adminLoginBtn').addEventListener('click', () => {
+            $('loginOverlay').classList.add('show');
+        });
+        $('mobileAdminBtn').addEventListener('click', () => {
+            closeMenu();
+            $('loginOverlay').classList.add('show');
+        });
+
+        // Fermeture login
+        $('loginOverlay').addEventListener('click', (e) => {
+            if (e.target === e.currentTarget) {
+                $('loginOverlay').classList.remove('show');
+            }
+        });
+
+        // ================================================================
         //  HAMBURGER MENU
         // ================================================================
-        const hamburgerBtn = document.getElementById('hamburgerBtn');
-        const mobileMenu = document.getElementById('mobileMenu');
-        const menuBackdrop = document.getElementById('menuBackdrop');
+        const hamburgerBtn = $('hamburgerBtn');
+        const mobileMenu = $('mobileMenu');
+        const menuBackdrop = $('menuBackdrop');
         const body = document.body;
 
         function toggleMenu() {
@@ -2573,7 +2216,6 @@
         hamburgerBtn.addEventListener('click', toggleMenu);
         menuBackdrop.addEventListener('click', closeMenu);
 
-        // Fermer le menu en cliquant sur un lien
         document.querySelectorAll('.mobile-menu-content a').forEach(link => {
             link.addEventListener('click', () => {
                 if (!link.classList.contains('mobile-admin-link')) {
@@ -2582,15 +2224,87 @@
             });
         });
 
-        // Admin via menu mobile
-        document.getElementById('mobileAdminBtn').addEventListener('click', () => {
-            closeMenu();
-            document.getElementById('loginOverlay').classList.add('show');
+        // ================================================================
+        //  CARROUSEL
+        // ================================================================
+        const carouselImages = [
+            'carrousel (1).jpeg', 'carrousel (2).jpeg', 'carrousel (3).jpeg',
+            'carrousel (4).jpeg', 'carrousel (5).jpeg', 'carrousel (6).jpeg',
+            'carrousel (7).jpeg', 'carrousel (8).jpeg', 'carrousel (9).jpeg',
+            'carrousel (10).jpeg', 'carrousel (11).jpeg', 'carrousel (12).jpeg',
+            'carrousel (13).jpeg', 'carrousel (14).jpeg', 'carrousel (15).jpeg'
+        ];
+
+        const carouselTexts = [
+            { atelier: 'Atelier Paris', title: 'Collection', span: 'Exclusive', subtitle: 'La Boutique', desc: 'Découvrez notre sélection <strong>Haute Gamme</strong> de vêtements pour hommes. Chaque pièce est soigneusement choisie pour incarner le <strong>luxe</strong>, le <strong>savoir-faire</strong> et l\'<strong>élégance intemporelle</strong>.' },
+            { atelier: 'Atelier Paris', title: 'L\'Art du', span: 'Vêtement', subtitle: 'Sur Mesure', desc: 'Des tissus d\'exception sélectionnés dans les plus grandes maisons italiennes et anglaises. Chaque pièce est une œuvre d\'art portée.' },
+            { atelier: 'Atelier Paris', title: 'Style', span: 'Authentique', subtitle: 'L\'Excellence', desc: 'Des pièces uniques qui racontent une histoire. Chaque vêtement est conçu pour l\'homme qui ose se démarquer avec <strong>élégance</strong>.' },
+            { atelier: 'Atelier Paris', title: 'Luxe', span: 'Moderne', subtitle: 'L\'Élégance', desc: 'Alliez le raffinement traditionnel à une coupe contemporaine. Découvrez des vêtements qui subliment <strong>votre silhouette</strong>.' },
+            { atelier: 'Atelier Paris', title: 'Élégance', span: 'Intemporelle', subtitle: 'Depuis 2026', desc: 'DLT Boutique incarne le raffinement à la française. Une signature unique pour l\'homme moderne qui recherche l\'excellence.' },
+            { atelier: 'Atelier Paris', title: 'L\'Art du', span: 'Détail', subtitle: 'La Perfection', desc: 'Chaque couture, chaque bouton, chaque tissu est choisi avec une <strong>précision</strong> digne des plus grandes maisons.' },
+            { atelier: 'Atelier Paris', title: 'Style', span: 'Parisien', subtitle: 'L\'Élégance', desc: 'Inspiré des plus grandes silhouettes parisiennes, notre collection allie <strong>modernité</strong> et <strong>tradition</strong>.' },
+            { atelier: 'Atelier Paris', title: 'Luxe', span: 'Responsable', subtitle: 'L\'Éthique', desc: 'Des matières nobles et durables, sélectionnées avec soin pour une <strong>élégance</strong> qui respecte la planète.' },
+            { atelier: 'Atelier Paris', title: 'L\'Art', span: 'du Sur-Mesure', subtitle: 'L\'Excellence', desc: 'Des vêtements conçus pour vous, avec une <strong>attention</strong> particulière à chaque détail pour une silhouette parfaite.' },
+            { atelier: 'Atelier Paris', title: 'Élégance', span: 'Moderne', subtitle: 'Le Style', desc: 'Une vision contemporaine du luxe, où chaque pièce est conçue pour <strong>sublimer</strong> l\'homme d\'aujourd\'hui.' },
+            { atelier: 'Atelier Paris', title: 'Collection', span: 'Privée', subtitle: 'L\'Exclusivité', desc: 'Une sélection limitée de pièces <strong>uniques</strong>, conçues pour ceux qui recherchent l\'exception.' },
+            { atelier: 'Atelier Paris', title: 'L\'Art de', span: 'Vivre', subtitle: 'L\'Élégance', desc: 'Plus qu\'un vêtement, une <strong>philosophie</strong>. L\'élégance est un art de vivre que nous cultivons.' },
+            { atelier: 'Atelier Paris', title: 'Style', span: 'Distingué', subtitle: 'La Classe', desc: 'Des pièces qui parlent d\'<strong>élégance</strong> sans jamais en faire trop. Le luxe dans la sobriété.' },
+            { atelier: 'Atelier Paris', title: 'Luxe', span: 'Authentique', subtitle: 'L\'Excellence', desc: 'Le véritable luxe est dans l\'<strong>authenticité</strong> des matières et la qualité des finitions.' },
+            { atelier: 'Atelier Paris', title: 'Élégance', span: 'Éternelle', subtitle: 'La Signature', desc: 'DLT Boutique, une <strong>signature</strong> unique pour l\'homme qui cherche l\'excellence et l\'éternel.' }
+        ];
+
+        const carouselContainer = $('heroCarousel');
+        const indicatorsContainer = $('carouselIndicators');
+
+        // Générer les slides
+        carouselImages.forEach((img, index) => {
+            const slide = document.createElement('div');
+            slide.className = `slide ${index === 0 ? 'active' : ''}`;
+            slide.style.backgroundImage = `url('${img}')`;
+            const text = carouselTexts[index % carouselTexts.length];
+            slide.innerHTML = `
+                <div class="slide-content">
+                    <div class="container" style="width:100%;">
+                        <div class="hero-content" style="min-height:70vh;">
+                            <div class="hero-text">
+                                <div class="atelier">${text.atelier}</div>
+                                <h1>${text.title}<br><span>${text.span}</span></h1>
+                                <p class="hero-subtitle">${text.subtitle}</p>
+                                <p class="hero-description">${text.desc}</p>
+                                <div class="hero-buttons">
+                                    <button class="btn-primary" data-slide="${index}">
+                                        <i class="fas fa-arrow-right"></i> Voir la collection
+                                    </button>
+                                    <button class="btn-secondary" data-slide="${index}">
+                                        <i class="fas fa-store"></i> Explorer
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="hero-visual">
+                                <div class="hero-logo-display">
+                                    <div class="ring-ornament"></div>
+                                    <div class="ring-ornament"></div>
+                                    <div class="big-logo">
+                                        DLT
+                                        <span>BOUTIQUE</span>
+                                    </div>
+                                    <div class="established">KASHIPUSE · 2026</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            carouselContainer.appendChild(slide);
+
+            // Indicateur
+            const dot = document.createElement('span');
+            dot.className = `dot ${index === 0 ? 'active' : ''}`;
+            dot.dataset.index = index;
+            indicatorsContainer.appendChild(dot);
         });
 
-        // ================================================================
-        //  CARROUSEL - 15 images
-        // ================================================================
+        // Carousel logic
         const slides = document.querySelectorAll('.hero-carousel .slide');
         const dots = document.querySelectorAll('.carousel-indicators .dot');
         let currentSlide = 0;
@@ -2630,114 +2344,238 @@
             });
         });
 
-        document.getElementById('nextSlide').addEventListener('click', () => {
+        $('nextSlide').addEventListener('click', () => {
             nextSlide();
             resetCarousel();
         });
 
-        document.getElementById('prevSlide').addEventListener('click', () => {
+        $('prevSlide').addEventListener('click', () => {
             prevSlide();
             resetCarousel();
         });
 
         startCarousel();
 
-        // ================================================================
-        //  DONNÉES PRINCIPALES
-        // ================================================================
-        let products = [];
-        let cart = [];
-        let orders = [];
-        let notifications = [];
-        let currentCategory = 'all';
-        let currentBrand = 'all';
-        let selectedPayment = 'airtel';
-        let isAdmin = false;
-        let shopVisible = false;
-
-        const ADMIN_CREDENTIALS = { email: 'admin@dlt.com', password: 'admin123' };
-
-        const KEYS = {
-            products: 'dlt_products_v2',
-            cart: 'dlt_cart_v2',
-            orders: 'dlt_orders_v2',
-            notifications: 'dlt_notifications_v2'
-        };
+        // Boutons des slides
+        document.querySelectorAll('.btn-primary[data-slide], .btn-secondary[data-slide]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                if (!shopVisible) showShop();
+                else document.getElementById('shopSection').scrollIntoView({ behavior: 'smooth' });
+            });
+        });
 
         // ================================================================
-        //  CHARGEMENT DES DONNÉES
+        //  FIRESTORE - CRUD PRODUITS
         // ================================================================
-        function loadData() {
-            const defaultProducts = [
-                { id: 1, name: "Blazer César", category: "veste", brand: "Armani", price: 890, stock: 12, image: "",
-                    badge: "Exclusif", description: "Laine italienne, coupe ajustée." },
-                { id: 2, name: "Veste Tweed", category: "veste", brand: "Hugo Boss", price: 750, stock: 8, image: "",
-                    badge: "Nouveau", description: "Tweed écossais, doublure soie." },
-                { id: 3, name: "Veste Cuir", category: "veste", brand: "Tom Ford", price: 1200, stock: 5, image: "",
-                    badge: "Premium", description: "Cuir de veau pleine fleur." },
-                { id: 4, name: "Chemise Oxford", category: "chemise", brand: "Armani", price: 195, stock: 20, image: "",
-                    badge: "", description: "Coton égyptien, col français." },
-                { id: 5, name: "Chemise Soie", category: "chemise", brand: "Hugo Boss", price: 320, stock: 10, image: "",
-                    badge: "Exclusif", description: "Soie pure, finition main." },
-                { id: 6, name: "Chemise Lin", category: "chemise", brand: "Tom Ford", price: 280, stock: 15, image: "",
-                    badge: "", description: "Lin irlandais, coupe décontractée." },
-                { id: 7, name: "Pantalon Tailleur", category: "pantalon", brand: "Armani", price: 450, stock: 14,
-                    image: "", badge: "", description: "Laine peignée, pli central." },
-                { id: 8, name: "Pantalon Chino", category: "pantalon", brand: "Hugo Boss", price: 295, stock: 18,
-                    image: "", badge: "", description: "Coton stretch, coupe slim." },
-                { id: 9, name: "Polo Piqué", category: "polo", brand: "Lacoste", price: 150, stock: 25, image: "",
-                    badge: "", description: "Coton piqué, col bordé." },
-                { id: 10, name: "Polo Soie", category: "polo", brand: "Armani", price: 220, stock: 10, image: "",
-                    badge: "Nouveau", description: "Soie mélangée, élégant." },
-                { id: 11, name: "Culotte de Golf", category: "culotte", brand: "Hugo Boss", price: 180, stock: 12,
-                    image: "", badge: "", description: "Coton stretch, coupe confort." },
-                { id: 12, name: "Mocassin Cuir", category: "chaussure", brand: "Armani", price: 450, stock: 9, image: "",
-                    badge: "", description: "Cuir de veau, semelle cuir." },
-                { id: 13, name: "Bottine Chelsea", category: "chaussure", brand: "Tom Ford", price: 680, stock: 6,
-                    image: "", badge: "Exclusif", description: "Cuir lisse, élastique." },
-                { id: 14, name: "Sneaker Luxe", category: "chaussure", brand: "Hugo Boss", price: 350, stock: 11,
-                    image: "", badge: "", description: "Cuir et daim, semelle caoutchouc." },
-                { id: 15, name: "Costume Mariage", category: "mariage", brand: "Armani", price: 1500, stock: 4,
-                    image: "", badge: "Premium", description: "Tissu italien, coupe cérémonie." },
-                { id: 16, name: "Smoking Noir", category: "mariage", brand: "Tom Ford", price: 2200, stock: 3,
-                    image: "", badge: "Exclusif", description: "Laine noire, revers en satin." },
-                { id: 17, name: "Cravate Soie", category: "accessoire", brand: "Hugo Boss", price: 180, stock: 30,
-                    image: "", badge: "", description: "Soie imprimée, motif élégant." },
-                { id: 18, name: "Ceinture Cuir", category: "accessoire", brand: "Armani", price: 250, stock: 20,
-                    image: "", badge: "", description: "Cuir pleine fleur, boucle en métal." },
-                { id: 19, name: "Portefeuille", category: "accessoire", brand: "Tom Ford", price: 320, stock: 15,
-                    image: "", badge: "", description: "Cuir de veau, finitions dorées." },
-                { id: 20, name: "Lunettes Soleil", category: "accessoire", brand: "Armani", price: 280, stock: 12,
-                    image: "", badge: "Nouveau", description: "Monture en acétate, verres polarisés." },
-            ];
-
-            const storedProducts = localStorage.getItem(KEYS.products);
-            products = storedProducts ? JSON.parse(storedProducts) : defaultProducts;
-            if (!storedProducts) localStorage.setItem(KEYS.products, JSON.stringify(products));
-
-            const storedCart = localStorage.getItem(KEYS.cart);
-            cart = storedCart ? JSON.parse(storedCart) : [];
-            if (!storedCart) localStorage.setItem(KEYS.cart, JSON.stringify(cart));
-
-            const storedOrders = localStorage.getItem(KEYS.orders);
-            orders = storedOrders ? JSON.parse(storedOrders) : [];
-            if (!storedOrders) localStorage.setItem(KEYS.orders, JSON.stringify(orders));
-
-            const storedNotifs = localStorage.getItem(KEYS.notifications);
-            notifications = storedNotifs ? JSON.parse(storedNotifs) : [];
-            if (!storedNotifs) localStorage.setItem(KEYS.notifications, JSON.stringify(notifications));
+        async function loadProducts() {
+            try {
+                const snapshot = await db.collection('products').orderBy('createdAt', 'desc').get();
+                products = [];
+                snapshot.forEach(doc => {
+                    products.push({ id: doc.id, ...doc.data() });
+                });
+                renderProducts();
+                renderCategories();
+                renderBrands();
+                if (isAdmin) renderAdmin();
+            } catch (error) {
+                console.error('Erreur chargement produits:', error);
+                showFlash('❌ Erreur lors du chargement des produits.', 2000);
+            }
         }
 
-        function saveProducts() { localStorage.setItem(KEYS.products, JSON.stringify(products)); }
-        function saveCart() { localStorage.setItem(KEYS.cart, JSON.stringify(cart)); }
-        function saveOrders() { localStorage.setItem(KEYS.orders, JSON.stringify(orders)); }
-        function saveNotifications() { localStorage.setItem(KEYS.notifications, JSON.stringify(notifications)); }
+        // Upload d'image
+        $('adminProductImage').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                selectedFile = file;
+                $('fileLabel').textContent = file.name;
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const preview = $('imagePreview');
+                    const img = $('previewImg');
+                    img.src = event.target.result;
+                    preview.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        async function uploadImage(file) {
+            if (!file) return null;
+            const storageRef = storage.ref();
+            const fileRef = storageRef.child(`products/${Date.now()}_${file.name}`);
+            const snapshot = await fileRef.put(file);
+            return await snapshot.ref.getDownloadURL();
+        }
+
+        // Ajouter/Modifier produit
+        $('adminForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!isAdmin) {
+                showFlash('⚠️ Vous devez être connecté en tant qu\'admin.', 2000);
+                return;
+            }
+
+            const submitBtn = $('adminSubmitBtn');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="loading-spinner"></span> Enregistrement...';
+
+            const id = $('editProductId').value;
+            const name = $('adminProductName').value.trim();
+            const category = $('adminProductCategory').value;
+            const brand = $('adminProductBrand').value.trim();
+            const price = parseFloat($('adminProductPrice').value);
+            const stock = parseInt($('adminProductStock').value);
+            const badge = $('adminProductBadge').value;
+            const description = $('adminProductDescription').value.trim();
+
+            if (!name || !category || !brand || isNaN(price) || isNaN(stock) || price <= 0 || stock < 0) {
+                showFlash('⚠️ Veuillez remplir tous les champs correctement.', 2000);
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-save"></i> Enregistrer le produit';
+                return;
+            }
+
+            try {
+                let imageUrl = $('adminProductImage').dataset.existingUrl || '';
+
+                // Upload nouvelle image
+                if (selectedFile) {
+                    imageUrl = await uploadImage(selectedFile);
+                }
+
+                const productData = {
+                    name,
+                    category,
+                    brand,
+                    price,
+                    stock,
+                    image: imageUrl,
+                    badge,
+                    description,
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                };
+
+                if (id) {
+                    await db.collection('products').doc(id).update(productData);
+                    addNotification(`✏️ Produit modifié : ${name}`);
+                    showFlash('✅ Produit modifié avec succès !', 2000);
+                } else {
+                    productData.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+                    await db.collection('products').add(productData);
+                    addNotification(`➕ Nouveau produit ajouté : ${name}`);
+                    showFlash('✅ Produit ajouté avec succès !', 2000);
+                }
+
+                // Réinitialiser le formulaire
+                $('adminForm').reset();
+                $('editProductId').value = '';
+                $('imagePreview').style.display = 'none';
+                $('fileLabel').textContent = 'Choisir une image';
+                selectedFile = null;
+                delete $('adminProductImage').dataset.existingUrl;
+
+                await loadProducts();
+            } catch (error) {
+                console.error('Erreur sauvegarde:', error);
+                showFlash('❌ Erreur lors de l\'enregistrement: ' + error.message, 3000);
+            }
+
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="fas fa-save"></i> Enregistrer le produit';
+        });
+
+        async function editProduct(id) {
+            const product = products.find(p => p.id === id);
+            if (!product) return;
+
+            $('editProductId').value = product.id;
+            $('adminProductName').value = product.name;
+            $('adminProductCategory').value = product.category;
+            $('adminProductBrand').value = product.brand;
+            $('adminProductPrice').value = product.price;
+            $('adminProductStock').value = product.stock;
+            $('adminProductBadge').value = product.badge || '';
+            $('adminProductDescription').value = product.description || '';
+
+            if (product.image) {
+                const preview = $('imagePreview');
+                const img = $('previewImg');
+                img.src = product.image;
+                preview.style.display = 'block';
+                $('adminProductImage').dataset.existingUrl = product.image;
+                $('fileLabel').textContent = 'Image actuelle';
+            }
+
+            $('adminForm').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        async function deleteProduct(id) {
+            if (!isAdmin) {
+                showFlash('⚠️ Vous devez être administrateur.', 2000);
+                return;
+            }
+            if (!confirm('Supprimer définitivement ce produit ?')) return;
+
+            try {
+                const product = products.find(p => p.id === id);
+                await db.collection('products').doc(id).delete();
+                addNotification(`🗑️ Produit supprimé : ${product?.name || 'ID ' + id}`);
+                showFlash('🗑️ Produit supprimé.', 1500);
+                await loadProducts();
+            } catch (error) {
+                console.error('Erreur suppression:', error);
+                showFlash('❌ Erreur lors de la suppression.', 2000);
+            }
+        }
+
+        // ================================================================
+        //  RENDU PRODUITS
+        // ================================================================
+        function renderProducts() {
+            const grid = $('productGrid');
+            let filtered = products.filter(p => {
+                const catMatch = currentCategory === 'all' || p.category === currentCategory;
+                const brandMatch = currentBrand === 'all' || p.brand === currentBrand;
+                return catMatch && brandMatch;
+            });
+
+            if (filtered.length === 0) {
+                grid.innerHTML = `<p style="grid-column:1/-1; text-align:center; padding:40px; color:#999;">Aucun produit dans cette sélection.</p>`;
+                return;
+            }
+
+            grid.innerHTML = filtered.map(p => `
+                <div class="product-card" data-id="${p.id}">
+                    <div class="product-image">
+                        ${p.image ? `<img src="${p.image}" alt="${p.name}">` : `<span class="placeholder-icon"><i class="fas fa-tshirt"></i></span>`}
+                        ${p.badge ? `<div class="product-badge">${p.badge}</div>` : ''}
+                        <div class="product-brand">${p.brand}</div>
+                    </div>
+                    <div class="product-info">
+                        <h3>${p.name}</h3>
+                        <div class="product-brand-name">${p.brand}</div>
+                        <div class="product-price">${p.price} $ <small>USD</small></div>
+                        <button class="add-to-cart-btn" data-id="${p.id}"><i class="fas fa-plus"></i> Ajouter au panier</button>
+                    </div>
+                </div>
+            `).join('');
+
+            document.querySelectorAll('.add-to-cart-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const id = btn.dataset.id;
+                    addToCart(id);
+                });
+            });
+        }
 
         // ================================================================
         //  RENDU CATÉGORIES
         // ================================================================
         function renderCategories() {
-            const grid = document.getElementById('categoriesGrid');
+            const grid = $('categoriesGrid');
             const cats = ['all', 'veste', 'chemise', 'pantalon', 'polo', 'culotte', 'chaussure', 'mariage', 'accessoire'];
             const labels = {
                 all: 'Tous',
@@ -2782,12 +2620,9 @@
                     renderProducts();
                     document.getElementById('currentCategoryLabel').textContent =
                         labels[currentCategory] || 'Tous';
-                    document.querySelectorAll('.nav-desktop a, .mobile-menu-content a').forEach(a => a.classList
-                        .remove('active'));
-                    document.querySelector(`.nav-desktop a[data-cat="${currentCategory}"]`)?.classList.add(
-                    'active');
-                    document.querySelector(`.mobile-menu-content a[data-cat="${currentCategory}"]`)?.classList
-                        .add('active');
+                    document.querySelectorAll('.nav-desktop a, .mobile-menu-content a').forEach(a => a.classList.remove('active'));
+                    document.querySelector(`.nav-desktop a[data-cat="${currentCategory}"]`)?.classList.add('active');
+                    document.querySelector(`.mobile-menu-content a[data-cat="${currentCategory}"]`)?.classList.add('active');
                 });
             });
         }
@@ -2796,7 +2631,7 @@
         //  RENDU MARQUES
         // ================================================================
         function renderBrands() {
-            const container = document.getElementById('brandFilter');
+            const container = $('brandFilter');
             let brands = products
                 .filter(p => currentCategory === 'all' || p.category === currentCategory)
                 .map(p => p.brand)
@@ -2831,48 +2666,6 @@
         }
 
         // ================================================================
-        //  RENDU PRODUITS
-        // ================================================================
-        function renderProducts() {
-            const grid = document.getElementById('productGrid');
-            let filtered = products.filter(p => {
-                const catMatch = currentCategory === 'all' || p.category === currentCategory;
-                const brandMatch = currentBrand === 'all' || p.brand === currentBrand;
-                return catMatch && brandMatch;
-            });
-
-            if (filtered.length === 0) {
-                grid.innerHTML =
-                    `<p style="grid-column:1/-1; text-align:center; padding:40px; color:#999;">Aucun produit dans cette sélection.</p>`;
-                return;
-            }
-
-            grid.innerHTML = filtered.map(p => `
-                <div class="product-card" data-id="${p.id}">
-                    <div class="product-image">
-                        ${p.image ? `<img src="${p.image}" alt="${p.name}">` : `<span class="placeholder-icon"><i class="fas fa-tshirt"></i></span>`}
-                        ${p.badge ? `<div class="product-badge">${p.badge}</div>` : ''}
-                        <div class="product-brand">${p.brand}</div>
-                    </div>
-                    <div class="product-info">
-                        <h3>${p.name}</h3>
-                        <div class="product-brand-name">${p.brand}</div>
-                        <div class="product-price">${p.price} € <small>HT</small></div>
-                        <button class="add-to-cart-btn" data-id="${p.id}"><i class="fas fa-plus"></i> Ajouter au panier</button>
-                    </div>
-                </div>
-            `).join('');
-
-            document.querySelectorAll('.add-to-cart-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    const id = parseInt(btn.dataset.id);
-                    addToCart(id);
-                });
-            });
-        }
-
-        // ================================================================
         //  PANIER
         // ================================================================
         function addToCart(productId) {
@@ -2893,14 +2686,12 @@
             } else {
                 cart.push({ ...product, qty: 1 });
             }
-            saveCart();
             updateCartUI();
             showFlash(`🛒 ${product.name} ajouté au panier.`, 1500);
         }
 
         function removeFromCart(productId) {
             cart = cart.filter(item => item.id !== productId);
-            saveCart();
             updateCartUI();
         }
 
@@ -2919,22 +2710,20 @@
                 item.qty = product.stock;
                 showFlash('⚠️ Stock maximum atteint.', 1500);
             }
-            saveCart();
             updateCartUI();
         }
 
         function updateCartUI() {
-            const container = document.getElementById('cartItems');
-            const totalEl = document.getElementById('cartTotal');
-            const badge = document.getElementById('cartCount');
+            const container = $('cartItems');
+            const totalEl = $('cartTotal');
+            const badge = $('cartCount');
 
             const totalItems = cart.reduce((sum, i) => sum + i.qty, 0);
             badge.textContent = totalItems;
 
             if (cart.length === 0) {
-                container.innerHTML =
-                `<p style="color:#999; text-align:center; padding:30px;">Votre panier est vide.</p>`;
-                totalEl.textContent = 'Total : 0 €';
+                container.innerHTML = `<p style="color:#999; text-align:center; padding:30px;">Votre panier est vide.</p>`;
+                totalEl.textContent = 'Total : 0 $';
                 return;
             }
 
@@ -2949,25 +2738,25 @@
                         <div class="cart-item-details">
                             <h5>${item.name}</h5>
                             <div style="font-size:12px;color:#888;">${item.brand}</div>
-                            <div class="cart-item-price">${item.price} €</div>
+                            <div class="cart-item-price">${item.price} $</div>
                         </div>
                         <div class="cart-item-qty">
-                            <button onclick="updateQty(${item.id}, -1)">−</button>
+                            <button onclick="updateQty('${item.id}', -1)">−</button>
                             <span>${item.qty}</span>
-                            <button onclick="updateQty(${item.id}, 1)">+</button>
+                            <button onclick="updateQty('${item.id}', 1)">+</button>
                         </div>
-                        <span class="remove-item" onclick="removeFromCart(${item.id})"><i class="fas fa-times"></i></span>
+                        <span class="remove-item" onclick="removeFromCart('${item.id}')"><i class="fas fa-times"></i></span>
                     </div>
                 `;
             }).join('');
 
-            totalEl.textContent = `Total : ${total.toFixed(2)} €`;
+            totalEl.textContent = `Total : ${total.toFixed(2)} $`;
         }
 
         // ================================================================
         //  PAIEMENT
         // ================================================================
-        function processPayment() {
+        $('payBtn').addEventListener('click', async () => {
             if (cart.length === 0) {
                 showFlash('⚠️ Votre panier est vide.', 2000);
                 return;
@@ -2979,125 +2768,111 @@
 
             showFlash(`⏳ Traitement du paiement par ${methodName}...`, 2000);
 
-            setTimeout(() => {
-                const order = {
-                    id: Date.now(),
+            try {
+                // Créer la commande dans Firestore
+                const orderData = {
                     items: JSON.parse(JSON.stringify(cart)),
                     total: total,
                     paymentMethod: methodName,
-                    date: new Date().toLocaleString(),
-                    status: 'payée'
+                    status: 'payée',
+                    date: new Date().toISOString(),
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 };
-                orders.push(order);
-                saveOrders();
 
-                cart.forEach(cartItem => {
-                    const product = products.find(p => p.id === cartItem.id);
+                const orderRef = await db.collection('orders').add(orderData);
+
+                // Mettre à jour les stocks
+                for (const item of cart) {
+                    const product = products.find(p => p.id === item.id);
                     if (product) {
-                        product.stock -= cartItem.qty;
+                        await db.collection('products').doc(item.id).update({
+                            stock: product.stock - item.qty
+                        });
                     }
-                });
-                saveProducts();
+                }
 
-                addNotification(
-                    `💰 Nouvelle commande de ${cart.length} articles - ${total.toFixed(2)} € par ${methodName}`);
+                addNotification(`💰 Nouvelle commande de ${cart.length} articles - ${total.toFixed(2)} $ par ${methodName}`);
 
+                // Vider le panier
                 cart = [];
-                saveCart();
                 updateCartUI();
-                document.getElementById('cartOverlay').classList.remove('open');
+                $('cartOverlay').classList.remove('open');
 
-                showFlash(`✅ Paiement de ${total.toFixed(2)} € réussi ! Merci pour votre commande.`, 3000);
+                showFlash(`✅ Paiement de ${total.toFixed(2)} $ réussi ! Merci pour votre commande.`, 3000);
 
+                await loadProducts();
                 if (isAdmin) renderAdmin();
 
-            }, 2000);
-        }
-
-        // ================================================================
-        //  NOTIFICATIONS
-        // ================================================================
-        function addNotification(message) {
-            notifications.unshift({ message, time: new Date().toLocaleString(), read: false });
-            saveNotifications();
-            if (isAdmin) renderAdmin();
-        }
-
-        // ================================================================
-        //  ADMIN
-        // ================================================================
-        document.getElementById('adminLoginBtn').addEventListener('click', () => {
-            document.getElementById('loginOverlay').classList.add('show');
-        });
-
-        document.getElementById('loginBtn').addEventListener('click', () => {
-            const email = document.getElementById('loginEmail').value.trim();
-            const pass = document.getElementById('loginPassword').value.trim();
-            const errorEl = document.getElementById('loginError');
-
-            if (email === ADMIN_CREDENTIALS.email && pass === ADMIN_CREDENTIALS.password) {
-                isAdmin = true;
-                document.getElementById('loginOverlay').classList.remove('show');
-                document.getElementById('adminDashboard').classList.add('show');
-                renderAdmin();
-                showFlash('👑 Bienvenue dans l\'espace administrateur.', 2000);
-            } else {
-                errorEl.style.display = 'block';
-                setTimeout(() => errorEl.style.display = 'none', 3000);
-            }
-        });
-
-        document.getElementById('logoutBtn').addEventListener('click', () => {
-            isAdmin = false;
-            document.getElementById('adminDashboard').classList.remove('show');
-            showFlash('👋 Déconnexion réussie.', 1500);
-        });
-
-        document.getElementById('loginOverlay').addEventListener('click', (e) => {
-            if (e.target === e.currentTarget) {
-                document.getElementById('loginOverlay').classList.remove('show');
+            } catch (error) {
+                console.error('Erreur paiement:', error);
+                showFlash('❌ Erreur lors du paiement: ' + error.message, 3000);
             }
         });
 
         // ================================================================
-        //  ADMIN : RENDU DASHBOARD
+        //  ADMIN - RENDU DASHBOARD
         // ================================================================
-        function renderAdmin() {
+        async function renderAdmin() {
+            if (!isAdmin) return;
+
             const totalProducts = products.length;
             const totalStock = products.reduce((sum, p) => sum + p.stock, 0);
-            const totalRevenue = orders.reduce((sum, o) => sum + o.total, 0);
 
-            document.getElementById('adminTotalProducts').textContent = totalProducts;
-            document.getElementById('adminTotalOrders').textContent = orders.length;
-            document.getElementById('adminTotalRevenue').textContent = totalRevenue.toFixed(2) + ' €';
-            document.getElementById('adminTotalStock').textContent = totalStock;
+            // Charger les commandes
+            try {
+                const ordersSnapshot = await db.collection('orders').orderBy('createdAt', 'desc').get();
+                orders = [];
+                let totalRevenue = 0;
+                ordersSnapshot.forEach(doc => {
+                    const order = { id: doc.id, ...doc.data() };
+                    orders.push(order);
+                    totalRevenue += order.total || 0;
+                });
 
-            const notifList = document.getElementById('notifList');
-            const notifCount = document.getElementById('notifCount');
-            const unread = notifications.filter(n => !n.read).length;
-            notifCount.textContent = unread;
+                $('adminTotalProducts').textContent = totalProducts;
+                $('adminTotalOrders').textContent = orders.length;
+                $('adminTotalRevenue').textContent = totalRevenue.toFixed(2) + ' $';
+                $('adminTotalStock').textContent = totalStock;
 
-            if (notifications.length === 0) {
-                notifList.innerHTML =
-                `<div style="color:#999; text-align:center; padding:15px;">Aucune notification</div>`;
-            } else {
-                notifList.innerHTML = notifications.slice(0, 10).map(n => `
-                    <div class="notif-item ${n.read ? '' : 'unread'}" style="${n.read ? 'opacity:0.7;' : ''}">
-                        <span>${n.message}</span>
-                        <span class="notif-time">${n.time}</span>
-                    </div>
-                `).join('');
-                notifications.forEach(n => n.read = true);
-                saveNotifications();
+                // Notifications
+                const notifList = $('notifList');
+                const notifCount = $('notifCount');
+
+                // Charger les notifications depuis Firestore
+                const notifSnapshot = await db.collection('notifications')
+                    .orderBy('createdAt', 'desc')
+                    .limit(10)
+                    .get();
+                notifications = [];
+                notifSnapshot.forEach(doc => {
+                    notifications.push({ id: doc.id, ...doc.data() });
+                });
+
+                notifCount.textContent = notifications.length;
+
+                if (notifications.length === 0) {
+                    notifList.innerHTML = `<div style="color:#999; text-align:center; padding:15px;">Aucune notification</div>`;
+                } else {
+                    notifList.innerHTML = notifications.map(n => `
+                        <div class="notif-item">
+                            <span>${n.message}</span>
+                            <span class="notif-time">${n.time || new Date(n.createdAt?.toDate()).toLocaleString() || 'N/A'}</span>
+                        </div>
+                    `).join('');
+                }
+
+            } catch (error) {
+                console.error('Erreur chargement admin:', error);
             }
 
-            const tbody = document.getElementById('adminProductTableBody');
+            // Tableau produits
+            const tbody = $('adminProductTableBody');
             tbody.innerHTML = products.map(p => `
                 <tr>
                     <td><strong>${p.name}</strong> ${p.badge ? `<span style="background:var(--gold);padding:2px 10px;border-radius:12px;font-size:11px;margin-left:6px;">${p.badge}</span>` : ''}</td>
                     <td>${p.category}</td>
                     <td>${p.brand}</td>
-                    <td>${p.price} €</td>
+                    <td>${p.price} $</td>
                     <td>${p.stock}</td>
                     <td class="admin-actions">
                         <i class="fas fa-edit" data-id="${p.id}" title="Modifier"></i>
@@ -3108,98 +2883,40 @@
 
             document.querySelectorAll('.admin-actions .fa-edit').forEach(btn => {
                 btn.addEventListener('click', () => {
-                    const id = parseInt(btn.dataset.id);
+                    const id = btn.dataset.id;
                     editProduct(id);
                 });
             });
 
             document.querySelectorAll('.admin-actions .fa-trash').forEach(btn => {
                 btn.addEventListener('click', () => {
-                    const id = parseInt(btn.dataset.id);
-                    if (confirm('Supprimer ce produit ?')) {
-                        deleteProduct(id);
-                    }
+                    const id = btn.dataset.id;
+                    deleteProduct(id);
                 });
             });
         }
 
         // ================================================================
-        //  ADMIN : CRUD PRODUITS
+        //  NOTIFICATIONS
         // ================================================================
-        document.getElementById('adminForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-            const id = document.getElementById('editProductId').value;
-            const name = document.getElementById('adminProductName').value.trim();
-            const category = document.getElementById('adminProductCategory').value;
-            const brand = document.getElementById('adminProductBrand').value.trim();
-            const price = parseFloat(document.getElementById('adminProductPrice').value);
-            const stock = parseInt(document.getElementById('adminProductStock').value);
-            const image = document.getElementById('adminProductImage').value.trim();
-            const badge = document.getElementById('adminProductBadge').value;
-            const description = document.getElementById('adminProductDescription').value.trim();
-
-            if (!name || !category || !brand || isNaN(price) || isNaN(stock) || price <= 0 || stock < 0) {
-                showFlash('⚠️ Veuillez remplir tous les champs correctement.', 2000);
-                return;
+        async function addNotification(message) {
+            try {
+                await db.collection('notifications').add({
+                    message,
+                    time: new Date().toLocaleString(),
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    read: false
+                });
+            } catch (error) {
+                console.error('Erreur ajout notification:', error);
             }
-
-            if (id) {
-                const index = products.findIndex(p => p.id === parseInt(id));
-                if (index !== -1) {
-                    products[index] = { ...products[index], name, category, brand, price, stock, image, badge,
-                        description };
-                    addNotification(`✏️ Produit modifié : ${name}`);
-                }
-            } else {
-                const newId = products.length ? Math.max(...products.map(p => p.id)) + 1 : 1;
-                products.push({ id: newId, name, category, brand, price, stock, image, badge, description });
-                addNotification(`➕ Nouveau produit ajouté : ${name}`);
-            }
-
-            saveProducts();
-            document.getElementById('adminForm').reset();
-            document.getElementById('editProductId').value = '';
-            renderProducts();
-            renderAdmin();
-            renderCategories();
-            renderBrands();
-            showFlash('✅ Produit enregistré avec succès !', 2000);
-        });
-
-        function editProduct(id) {
-            const product = products.find(p => p.id === id);
-            if (!product) return;
-
-            document.getElementById('editProductId').value = product.id;
-            document.getElementById('adminProductName').value = product.name;
-            document.getElementById('adminProductCategory').value = product.category;
-            document.getElementById('adminProductBrand').value = product.brand;
-            document.getElementById('adminProductPrice').value = product.price;
-            document.getElementById('adminProductStock').value = product.stock;
-            document.getElementById('adminProductImage').value = product.image || '';
-            document.getElementById('adminProductBadge').value = product.badge || '';
-            document.getElementById('adminProductDescription').value = product.description || '';
-
-            document.getElementById('adminForm').scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
-
-        function deleteProduct(id) {
-            const product = products.find(p => p.id === id);
-            products = products.filter(p => p.id !== id);
-            saveProducts();
-            addNotification(`🗑️ Produit supprimé : ${product?.name || 'ID ' + id}`);
-            renderProducts();
-            renderAdmin();
-            renderCategories();
-            renderBrands();
-            showFlash('🗑️ Produit supprimé.', 1500);
         }
 
         // ================================================================
         //  AFFICHAGE DE LA BOUTIQUE
         // ================================================================
         function showShop() {
-            const shopSection = document.getElementById('shopSection');
+            const shopSection = $('shopSection');
             shopSection.classList.add('visible');
             shopVisible = true;
             setTimeout(() => {
@@ -3209,21 +2926,12 @@
             document.querySelector('.mobile-menu-content a[data-cat="all"]')?.classList.add('active');
         }
 
-        document.querySelectorAll('[id^="seeCollectionBtn"]').forEach(btn => {
+        // Boutons "Voir la collection"
+        document.querySelectorAll('.btn-primary').forEach(btn => {
             btn.addEventListener('click', showShop);
         });
 
-        document.querySelectorAll('[id^="scrollToShopBtn"]').forEach(btn => {
-            btn.addEventListener('click', () => {
-                if (!shopVisible) {
-                    showShop();
-                } else {
-                    document.getElementById('shopSection').scrollIntoView({ behavior: 'smooth' });
-                }
-            });
-        });
-
-        // Navigation catégories (desktop + mobile)
+        // Navigation catégories
         document.querySelectorAll('.nav-desktop a[data-cat], .mobile-menu-content a[data-cat]').forEach(link => {
             link.addEventListener('click', () => {
                 if (!shopVisible) showShop();
@@ -3233,25 +2941,22 @@
                 renderBrands();
                 renderProducts();
                 const label = link.textContent.trim();
-                document.getElementById('currentCategoryLabel').textContent = label;
-                document.querySelectorAll('.nav-desktop a, .mobile-menu-content a').forEach(a => a.classList
-                    .remove('active'));
-                document.querySelector(`.nav-desktop a[data-cat="${currentCategory}"]`)?.classList.add(
-                'active');
-                document.querySelector(`.mobile-menu-content a[data-cat="${currentCategory}"]`)?.classList
-                    .add('active');
+                $('currentCategoryLabel').textContent = label;
+                document.querySelectorAll('.nav-desktop a, .mobile-menu-content a').forEach(a => a.classList.remove('active'));
+                document.querySelector(`.nav-desktop a[data-cat="${currentCategory}"]`)?.classList.add('active');
+                document.querySelector(`.mobile-menu-content a[data-cat="${currentCategory}"]`)?.classList.add('active');
             });
         });
 
         // ================================================================
         //  ÉVÉNEMENTS UI
         // ================================================================
-        document.getElementById('cartIcon').addEventListener('click', () => {
-            document.getElementById('cartOverlay').classList.add('open');
+        $('cartIcon').addEventListener('click', () => {
+            $('cartOverlay').classList.add('open');
             updateCartUI();
         });
-        document.getElementById('closeCart').addEventListener('click', () => {
-            document.getElementById('cartOverlay').classList.remove('open');
+        $('closeCart').addEventListener('click', () => {
+            $('cartOverlay').classList.remove('open');
         });
 
         document.querySelectorAll('.payment-method').forEach(el => {
@@ -3263,17 +2968,15 @@
         });
         document.querySelector('.payment-method')?.classList.add('selected');
 
-        document.getElementById('payBtn').addEventListener('click', processPayment);
-
         document.addEventListener('click', (e) => {
-            const overlay = document.getElementById('cartOverlay');
+            const overlay = $('cartOverlay');
             if (overlay.classList.contains('open') && !overlay.contains(e.target) && e.target.id !== 'cartIcon') {
                 overlay.classList.remove('open');
             }
         });
 
         window.addEventListener('scroll', () => {
-            const header = document.getElementById('mainHeader');
+            const header = $('mainHeader');
             if (window.scrollY > 60) {
                 header.classList.add('scrolled');
             } else {
@@ -3285,33 +2988,27 @@
         //  FLASH MESSAGE
         // ================================================================
         function showFlash(message, duration = 2000) {
-            const el = document.getElementById('flashMessage');
-            el.textContent = message;
-            el.classList.add('show');
-            clearTimeout(el._timeout);
-            el._timeout = setTimeout(() => el.classList.remove('show'), duration);
+            flashMsg.textContent = message;
+            flashMsg.classList.add('show');
+            clearTimeout(flashMsg._timeout);
+            flashMsg._timeout = setTimeout(() => flashMsg.classList.remove('show'), duration);
         }
 
         // ================================================================
         //  INIT
         // ================================================================
-        loadData();
-        renderCategories();
-        renderBrands();
-        renderProducts();
-        updateCartUI();
-
-        if (isAdmin) {
-            document.getElementById('adminDashboard').classList.add('show');
-            renderAdmin();
+        async function init() {
+            await loadProducts();
+            updateCartUI();
+            console.log('👔 DLT BOUTIQUE - Atelier Paris');
+            console.log('🔥 Firebase connecté avec succès !');
+            console.log('📦 Base de données Firestore en ligne.');
+            console.log('☁️ Storage pour les images.');
+            console.log('🔐 Authentification Firebase.');
+            console.log('👑 Admin: admin@dlt.com / admin123');
         }
 
-        console.log('👔 DLT BOUTIQUE - Atelier Paris');
-        console.log('📦 Données stockées dans localStorage.');
-        console.log('👑 Admin: admin@dlt.com / admin123');
-        console.log('🍔 Menu hamburger activé sur mobile et tablette');
-        console.log('🖼️ Carrousel avec 15 images personnalisées');
-        console.log('📸 Images: carrousel (1) à (15).jpeg');
+        init();
     </script>
 
 </body>
