@@ -1441,6 +1441,75 @@
             }
         }
 
+        /* ===== BULK UPLOAD SECTION ===== */
+        .bulk-upload-section {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 30px;
+        }
+        .bulk-upload-section h4 {
+            font-weight: 500;
+            margin-bottom: 15px;
+            color: var(--dark);
+        }
+        .bulk-upload-section .bulk-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            max-height: 400px;
+            overflow-y: auto;
+            padding: 10px;
+            border: 1px solid #eee;
+            border-radius: 8px;
+        }
+        .bulk-upload-section .bulk-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 10px;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            background: #faf8f6;
+            transition: var(--transition);
+        }
+        .bulk-upload-section .bulk-item:hover {
+            border-color: var(--gold);
+        }
+        .bulk-upload-section .bulk-item img {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 6px;
+            background: #eae5de;
+            margin-bottom: 8px;
+        }
+        .bulk-upload-section .bulk-item .bulk-name {
+            font-size: 12px;
+            text-align: center;
+            color: #555;
+            word-break: break-all;
+        }
+        .bulk-upload-section .bulk-item .bulk-status {
+            font-size: 11px;
+            margin-top: 4px;
+            padding: 2px 10px;
+            border-radius: 12px;
+        }
+        .bulk-upload-section .bulk-item .bulk-status.pending {
+            background: #f39c12;
+            color: white;
+        }
+        .bulk-upload-section .bulk-item .bulk-status.uploaded {
+            background: #27ae60;
+            color: white;
+        }
+        .bulk-upload-section .bulk-item .bulk-status.error {
+            background: #c0392b;
+            color: white;
+        }
+
         /* ===== RESPONSIVE ===== */
         @media (max-width: 1024px) {
             .hero-content {
@@ -1549,6 +1618,9 @@
             .carousel-indicators .dot {
                 width: 10px;
                 height: 10px;
+            }
+            .bulk-upload-section .bulk-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
             }
         }
         @media (max-width: 480px) {
@@ -1765,12 +1837,28 @@
                 <div class="stat-card"><div class="stat-number" id="adminTotalRevenue">0 $</div><div class="stat-label">Chiffre d'affaires</div></div>
                 <div class="stat-card"><div class="stat-number" id="adminTotalStock">0</div><div class="stat-label">Stock total</div></div>
             </div>
+            
+            <!-- SECTION UPLOAD EN MASSE -->
+            <div class="bulk-upload-section" id="bulkUploadSection">
+                <h4><i class="fas fa-images"></i> Gestion des images</h4>
+                <p style="color:#888; font-size:14px; margin-bottom:15px;">
+                    Sélectionnez une image pour chaque produit. Cliquez sur "Parcourir" pour choisir une image.
+                </p>
+                <div class="bulk-grid" id="bulkGrid">
+                    <!-- Les produits avec upload d'images seront affichés ici -->
+                </div>
+                <button class="btn-primary" id="bulkUploadBtn" style="margin-top:15px; width:100%; justify-content:center;">
+                    <i class="fas fa-cloud-upload-alt"></i> Uploader toutes les images sélectionnées
+                </button>
+            </div>
+
             <div style="margin-bottom:25px;">
                 <h4 style="font-weight:300; letter-spacing:1px; margin-bottom:12px;"><i class="fas fa-bell"></i> Notifications <span class="notification-badge" id="notifCount">0</span></h4>
                 <div class="notif-list" id="notifList">
                     <div style="color:#999; text-align:center; padding:15px;">Aucune notification</div>
                 </div>
             </div>
+            
             <div class="admin-form" id="adminForm">
                 <input type="hidden" id="editProductId">
                 <input type="text" id="adminProductName" placeholder="Nom du produit" required>
@@ -1785,8 +1873,8 @@
                     <option value="mariage">Mariage</option>
                     <option value="accessoire">Accessoire</option>
                 </select>
-                <input type="text" id="adminProductBrand" placeholder="Marque (ex: Armani, Hugo Boss...)" required>
-                <input type="number" id="adminProductPrice" placeholder="Prix (USD)" step="0.01" required>
+                <input type="text" id="adminProductBrand" placeholder="Marque" required>
+                <input type="number" id="adminProductPrice" placeholder="Prix (USD)" step="0.01">
                 <input type="number" id="adminProductStock" placeholder="Stock" required>
                 <div class="full-width">
                     <div class="file-upload-wrapper">
@@ -1839,7 +1927,7 @@
     <div class="flash-message" id="flashMessage"></div>
 
     <!-- ============================================================
-    JAVASCRIPT - CORRIGÉ
+    JAVASCRIPT - AVEC SYSTEME D'UPLOAD D'IMAGES
     ============================================================ -->
     <script>
         // ================================================================
@@ -1858,19 +1946,60 @@
 
         console.log('🔥 Initialisation de Firebase...');
         firebase.initializeApp(firebaseConfig);
-        console.log('✅ Firebase App initialisée');
 
         const db = firebase.firestore();
-        console.log('✅ Firestore initialisé');
-
         const storage = firebase.storage();
-        console.log('✅ Firebase Storage initialisé');
-
         const auth = firebase.auth();
-        console.log('✅ Firebase Auth initialisé');
 
-        const analytics = firebase.analytics();
-        console.log('✅ Firebase Analytics initialisé');
+        // ================================================================
+        //  LISTE DES IMAGES PAR CATÉGORIE (pour le bulk upload)
+        // ================================================================
+        const IMAGE_FILES = {
+            veste: [
+                'veste (1).jpeg', 'veste (2).jpeg', 'veste (3).jpeg', 'veste (4).jpeg',
+                'veste (5).jpeg', 'veste (6).jpeg', 'veste (7).jpeg', 'veste (8).jpeg',
+                'veste (9).jpeg', 'veste (10).jpeg', 'veste (11).jpeg', 'veste (12).jpeg',
+                'veste (13).jpeg', 'veste (14).jpeg', 'veste (15).jpeg', 'veste (16).jpeg',
+                'veste (17).jpeg', 'veste (18).jpeg', 'veste (19).jpeg', 'veste (20).jpeg',
+                'veste (21).jpeg', 'veste (22).jpeg', 'veste (23).jpeg', 'veste (24).jpeg',
+                'veste (25).jpeg', 'veste (26).jpeg', 'veste (27).jpeg', 'veste (28).jpeg',
+                'veste (29).jpeg'
+            ],
+            chemise: [
+                'chemise (1).jpeg', 'chemise (2).jpeg', 'chemise (3).jpeg', 'chemise (4).jpeg',
+                'chemise (5).jpeg', 'chemise (6).jpeg', 'chemise (7).jpeg', 'chemise (8).jpeg',
+                'chemise (9).jpeg', 'chemise (10).jpeg', 'chemise (11).jpeg'
+            ],
+            pantalon: [
+                'pantalon (1).jpeg', 'pantalon (2).jpeg', 'pantalon (3).jpeg', 'pantalon (4).jpeg',
+                'pantalon (5).jpeg', 'pantalon (6).jpeg', 'pantalon (7).jpeg', 'pantalon (8).jpeg',
+                'pantalon (9).jpeg', 'pantalon (10).jpeg', 'pantalon (11).jpeg', 'pantalon (12).jpeg',
+                'pantalon (13).jpeg', 'pantalon (14).jpeg', 'pantalon (15).jpeg', 'pantalon (16).jpeg',
+                'pantalon (17).jpeg', 'pantalon (18).jpeg', 'pantalon (19).jpeg', 'pantalon (20).jpeg',
+                'pantalon (21).jpeg', 'pantalon (22).jpeg', 'pantalon (23).jpeg', 'pantalon (24).jpeg',
+                'pantalon (25).jpeg', 'pantalon (26).jpeg', 'pantalon (27).jpeg', 'pantalon (28).jpeg',
+                'pantalon (29).jpeg', 'pantalon (30).jpeg'
+            ],
+            polo: [
+                'polo (1).jpeg', 'polo (2).jpeg', 'polo (3).jpeg', 'polo (4).jpeg',
+                'polo (5).jpeg', 'polo (6).jpeg', 'polo (7).jpeg', 'polo (8).jpeg',
+                'polo (9).jpeg', 'polo (10).jpeg', 'polo (11).jpeg', 'polo (12).jpeg',
+                'polo (13).jpeg', 'polo (14).jpeg'
+            ],
+            chaussure: [
+                'chaussire (1).jpeg', 'chaussire (2).jpeg', 'chaussire (3).jpeg', 'chaussire (4).jpeg',
+                'chaussire (5).jpeg', 'chaussire (6).jpeg', 'chaussire (7).jpeg', 'chaussire (8).jpeg',
+                'chaussire (9).jpeg', 'chaussire (10).jpeg', 'chaussire (11).jpeg'
+            ],
+            mariage: [
+                'mariage (1).jpeg', 'mariage (2).jpeg', 'mariage (3).jpeg', 'mariage (4).jpeg',
+                'mariage (5).jpeg', 'mariage (6).jpeg', 'mariage (7).jpeg'
+            ],
+            accessoire: [
+                'ACCESSOIRE VESTE (1).jpeg', 'ACCESSOIRE VESTE (2).jpeg', 'ACCESSOIRE VESTE (3).jpeg',
+                'ACCESSOIRE VESTE (4).jpeg', 'ACCESSOIRE VESTE (5).jpeg', 'ACCESSOIRE VESTE (6).jpeg'
+            ]
+        };
 
         // ================================================================
         //  ÉTAT DE L'APPLICATION
@@ -1894,20 +2023,37 @@
         const flashMsg = $('flashMessage');
 
         // ================================================================
-        //  RÉINITIALISATION AUTOMATIQUE DE FIRESTORE - SIMPLIFIÉE
+        //  FONCTION POUR UPLOADER UNE IMAGE VERS FIREBASE STORAGE
+        // ================================================================
+        async function uploadImageToStorage(file, productId) {
+            if (!file) return null;
+            try {
+                console.log('📤 Upload de l\'image pour le produit:', productId);
+                const fileName = `${productId}_${Date.now()}_${file.name}`;
+                const storageRef = storage.ref(`products/${fileName}`);
+                const uploadTask = storageRef.put(file);
+                const snapshot = await uploadTask;
+                const downloadURL = await snapshot.ref.getDownloadURL();
+                console.log('✅ Image uploadée:', downloadURL);
+                return downloadURL;
+            } catch (error) {
+                console.error('❌ Erreur upload image:', error);
+                return null;
+            }
+        }
+
+        // ================================================================
+        //  INITIALISATION
         // ================================================================
         async function initializeFirestore() {
             console.log('🔄 Initialisation de Firestore...');
             
             try {
-                // 1. Vérifier et créer l'admin
-                console.log('📌 Vérification de l\'administrateur...');
+                // Vérifier et créer l'admin
                 const adminSnapshot = await db.collection('admins').where('email', '==', 'admin@dlt.com').get();
                 
                 if (adminSnapshot.empty) {
                     console.log('👑 Création de l\'admin...');
-                    
-                    // Vérifier si l'utilisateur existe déjà dans Auth
                     try {
                         const userCredential = await auth.createUserWithEmailAndPassword('admin@dlt.com', 'admin123');
                         const uid = userCredential.user.uid;
@@ -1916,11 +2062,9 @@
                             role: 'admin',
                             createdAt: firebase.firestore.FieldValue.serverTimestamp()
                         });
-                        console.log('✅ Admin créé avec succès !');
                         await auth.signOut();
                     } catch (e) {
                         if (e.code === 'auth/email-already-in-use') {
-                            console.log('ℹ️ Admin existe déjà dans Auth');
                             const userCred = await auth.signInWithEmailAndPassword('admin@dlt.com', 'admin123');
                             const uid = userCred.user.uid;
                             const docRef = db.collection('admins').doc(uid);
@@ -1931,116 +2075,87 @@
                                     role: 'admin',
                                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
                                 });
-                                console.log('✅ Admin ajouté à Firestore');
                             }
                             await auth.signOut();
                         }
                     }
-                } else {
-                    console.log('✅ Admin déjà existant');
                 }
 
-                // 2. Vérifier et créer les produits de démonstration
-                console.log('📌 Vérification des produits...');
+                // Vérifier si des produits existent
                 const productsSnapshot = await db.collection('products').limit(1).get();
                 
                 if (productsSnapshot.empty) {
-                    console.log('📦 Création des produits de démonstration...');
-                    const demoProducts = [
-                        { name: 'Veste en Laine Cachemire', category: 'veste', brand: 'Armani', price: 299.99, stock: 15, image: '', badge: 'Exclusif', description: 'Veste en laine cachemire italienne.' },
-                        { name: 'Chemise Oxford Blanc', category: 'chemise', brand: 'Hugo Boss', price: 89.99, stock: 25, image: '', badge: 'Nouveau', description: 'Chemise Oxford en coton égyptien.' },
-                        { name: 'Pantalon Tailleur Gris', category: 'pantalon', brand: 'Zegna', price: 199.99, stock: 12, image: '', badge: 'Premium', description: 'Pantalon de costume en laine peignée.' },
-                        { name: 'Polo Coton Piqué', category: 'polo', brand: 'Lacoste', price: 69.99, stock: 30, image: '', badge: '', description: 'Polo en coton piqué.' },
-                        { name: 'Culotte Chino Bleue', category: 'culotte', brand: 'Dockers', price: 79.99, stock: 20, image: '', badge: '', description: 'Culotte chino en coton stretch.' },
-                        { name: 'Mocassin Cuir Noir', category: 'chaussure', brand: 'Ferragamo', price: 249.99, stock: 8, image: '', badge: 'Exclusif', description: 'Mocassin en cuir de veau noir.' },
-                        { name: 'Costume Mariage Bleu', category: 'mariage', brand: 'Tom Ford', price: 599.99, stock: 5, image: '', badge: 'Premium', description: 'Costume de mariage en laine super 120.' },
-                        { name: 'Cravate Soie Bordeaux', category: 'accessoire', brand: 'Hermès', price: 149.99, stock: 18, image: '', badge: 'Nouveau', description: 'Cravate en soie 100%.' }
-                    ];
-                    for (const product of demoProducts) {
-                        await db.collection('products').add({
-                            ...product,
-                            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                        });
+                    console.log('📦 Création des produits...');
+                    
+                    // Se connecter en tant qu'admin
+                    await auth.signInWithEmailAndPassword('admin@dlt.com', 'admin123');
+                    
+                    let productCount = 0;
+                    
+                    for (const [category, images] of Object.entries(IMAGE_FILES)) {
+                        const categoryLabel = category.charAt(0).toUpperCase() + category.slice(1);
+                        
+                        for (let i = 0; i < images.length; i++) {
+                            const imageName = images[i];
+                            const productName = `${categoryLabel} ${i + 1}`;
+                            
+                            // Créer le produit avec une image placeholder
+                            const productRef = await db.collection('products').add({
+                                name: productName,
+                                category: category,
+                                brand: 'DLT Collection',
+                                price: 0,
+                                stock: Math.floor(Math.random() * 30) + 5,
+                                image: `https://via.placeholder.com/400x400/1a1a1a/d4af37?text=${encodeURIComponent(productName)}`,
+                                badge: i === 0 ? 'Nouveau' : '',
+                                description: `${categoryLabel} de qualité, modèle ${i + 1}`,
+                                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                            });
+                            
+                            productCount++;
+                        }
                     }
-                    console.log('✅ 8 produits créés');
-                }
-
-                // 3. Vérifier et créer une commande de démonstration
-                console.log('📌 Vérification des commandes...');
-                const ordersSnapshot = await db.collection('orders').limit(1).get();
-                if (ordersSnapshot.empty) {
-                    console.log('📦 Création d\'une commande de démonstration...');
-                    await db.collection('orders').add({
-                        items: [{ name: 'Veste en Laine Cachemire', brand: 'Armani', price: 299.99, qty: 1 }],
-                        total: 299.99,
-                        paymentMethod: 'airtel',
-                        status: 'payée',
-                        date: new Date().toISOString(),
-                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                    });
-                    console.log('✅ Commande créée');
-                }
-
-                // 4. Vérifier et créer les notifications
-                console.log('📌 Vérification des notifications...');
-                const notifSnapshot = await db.collection('notifications').limit(1).get();
-                if (notifSnapshot.empty) {
-                    console.log('📦 Création des notifications...');
-                    await db.collection('notifications').add({
-                        message: '👑 Bienvenue sur DLT BOUTIQUE !',
-                        time: new Date().toLocaleString(),
-                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                        read: false
-                    });
-                    await db.collection('notifications').add({
-                        message: '📦 8 produits de démonstration disponibles',
-                        time: new Date().toLocaleString(),
-                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                        read: false
-                    });
-                    console.log('✅ Notifications créées');
+                    
+                    await auth.signOut();
+                    console.log(`✅ ${productCount} produits créés !`);
                 }
 
                 console.log('✅ Firestore initialisé avec succès !');
                 return true;
 
             } catch (error) {
-                console.error('❌ Erreur initialisation Firestore:', error);
+                console.error('❌ Erreur initialisation:', error);
                 return false;
             }
         }
 
         // ================================================================
-        //  AUTHENTIFICATION - CORRIGÉE
+        //  AUTHENTIFICATION
         // ================================================================
         auth.onAuthStateChanged(async (user) => {
             console.log('🔄 onAuthStateChanged:', user ? user.email : 'Aucun utilisateur');
             
-            // Réinitialiser le bouton de connexion
             const loginBtn = $('loginBtn');
             loginBtn.disabled = false;
             loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Se connecter';
             
             if (user) {
                 currentUser = user;
-                console.log('👤 Utilisateur connecté:', user.email);
                 
                 try {
                     const adminDoc = await db.collection('admins').doc(user.uid).get();
                     
                     if (adminDoc.exists && adminDoc.data().role === 'admin') {
                         isAdmin = true;
-                        console.log('👑 Admin vérifié !');
                         $('adminDashboard').classList.add('show');
                         await loadProducts();
                         await renderAdmin();
+                        await renderBulkUpload();
                         $('loginOverlay').classList.remove('show');
                         showFlash('👑 Bienvenue dans l\'espace administrateur.', 2000);
                     } else {
-                        // Si c'est admin@dlt.com mais pas dans admins
                         if (user.email === 'admin@dlt.com') {
-                            console.log('🔧 Ajout de l\'admin...');
                             await db.collection('admins').doc(user.uid).set({
                                 email: 'admin@dlt.com',
                                 role: 'admin',
@@ -2050,14 +2165,13 @@
                             $('adminDashboard').classList.add('show');
                             await loadProducts();
                             await renderAdmin();
+                            await renderBulkUpload();
                             $('loginOverlay').classList.remove('show');
                             showFlash('👑 Admin ajouté avec succès !', 2000);
                         } else {
                             isAdmin = false;
-                            console.log('👤 Utilisateur standard');
                             $('adminDashboard').classList.remove('show');
                             $('loginOverlay').classList.remove('show');
-                            showFlash('👤 Connecté en tant qu\'utilisateur standard.', 2000);
                         }
                     }
                 } catch (error) {
@@ -2069,52 +2183,29 @@
                 currentUser = null;
                 isAdmin = false;
                 $('adminDashboard').classList.remove('show');
-                console.log('👤 Aucun utilisateur connecté');
             }
         });
 
         // ================================================================
-        //  LOGIN - CORRIGÉ
+        //  LOGIN
         // ================================================================
         $('loginBtn').addEventListener('click', async () => {
             const email = $('loginEmail').value.trim();
             const password = $('loginPassword').value.trim();
             const errorEl = $('loginError');
-            const successEl = $('loginSuccess');
             const loginBtn = $('loginBtn');
             
             errorEl.style.display = 'none';
-            successEl.style.display = 'none';
             
             loginBtn.disabled = true;
             loginBtn.innerHTML = '<span class="loading-spinner"></span> Connexion...';
             
             try {
-                console.log('🔐 Tentative de connexion pour:', email);
                 await auth.signInWithEmailAndPassword(email, password);
-                console.log('✅ Connexion réussie');
-                
-                // La suite est gérée par onAuthStateChanged
-                successEl.textContent = '✅ Connexion réussie !';
-                successEl.style.display = 'block';
-                
             } catch (error) {
                 console.error('❌ Erreur de connexion:', error);
-                
-                let errorMessage = '❌ Identifiants incorrects.';
-                if (error.code === 'auth/user-not-found') {
-                    errorMessage = '❌ Aucun compte trouvé avec cet email.';
-                } else if (error.code === 'auth/wrong-password') {
-                    errorMessage = '❌ Mot de passe incorrect.';
-                } else if (error.code === 'auth/too-many-requests') {
-                    errorMessage = '❌ Trop de tentatives. Réessayez plus tard.';
-                } else if (error.code === 'auth/network-request-failed') {
-                    errorMessage = '❌ Problème de réseau. Vérifiez votre connexion.';
-                }
-                
-                errorEl.textContent = errorMessage;
+                errorEl.textContent = '❌ Identifiants incorrects.';
                 errorEl.style.display = 'block';
-                
                 loginBtn.disabled = false;
                 loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Se connecter';
             }
@@ -2131,7 +2222,6 @@
                 showFlash('👋 Déconnexion réussie.', 1500);
             } catch (error) {
                 console.error('❌ Erreur déconnexion:', error);
-                showFlash('❌ Erreur lors de la déconnexion.', 2000);
             }
         });
 
@@ -2141,26 +2231,17 @@
         $('adminLoginBtn').addEventListener('click', () => {
             $('loginOverlay').classList.add('show');
             $('loginError').style.display = 'none';
-            $('loginSuccess').style.display = 'none';
         });
         
         $('mobileAdminBtn').addEventListener('click', () => {
             closeMenu();
             $('loginOverlay').classList.add('show');
             $('loginError').style.display = 'none';
-            $('loginSuccess').style.display = 'none';
         });
 
         $('loginOverlay').addEventListener('click', (e) => {
             if (e.target === e.currentTarget) {
                 $('loginOverlay').classList.remove('show');
-            }
-        });
-
-        // Connexion avec Entrée
-        document.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter' && $('loginOverlay').classList.contains('show')) {
-                $('loginBtn').click();
             }
         });
 
@@ -2188,7 +2269,7 @@
         menuBackdrop.addEventListener('click', closeMenu);
 
         // ================================================================
-        //  CARROUSEL (version simplifiée)
+        //  CARROUSEL
         // ================================================================
         const carouselImages = [
             'carrousel (1).jpg', 'carrousel (2).jpeg', 'carrousel (3).jpeg',
@@ -2289,7 +2370,10 @@
                 renderProducts();
                 renderCategories();
                 renderBrands();
-                if (isAdmin) renderAdmin();
+                if (isAdmin) {
+                    renderAdmin();
+                    renderBulkUpload();
+                }
             } catch (error) {
                 console.error('❌ Erreur chargement produits:', error);
                 showFlash('❌ Erreur lors du chargement des produits.', 2000);
@@ -2297,26 +2381,105 @@
         }
 
         // ================================================================
-        //  UPLOAD D'IMAGE
+        //  RENDU BULK UPLOAD
         // ================================================================
-        async function uploadImageToStorage(file) {
-            if (!file) return null;
-            try {
-                console.log('📤 Upload de l\'image...');
-                const timestamp = Date.now();
-                const fileName = `${timestamp}_${file.name}`;
-                const storageRef = storage.ref(`products/${fileName}`);
-                const uploadTask = storageRef.put(file);
-                const snapshot = await uploadTask;
-                const downloadURL = await snapshot.ref.getDownloadURL();
-                console.log('✅ Image uploadée');
-                return downloadURL;
-            } catch (error) {
-                console.error('❌ Erreur upload image:', error);
-                showFlash('❌ Erreur upload image', 3000);
-                return null;
-            }
+        function renderBulkUpload() {
+            const grid = $('bulkGrid');
+            if (!grid) return;
+            
+            grid.innerHTML = products.map(p => `
+                    <div class="bulk-item" data-id="${p.id}">
+                        <img src="${p.image || 'https://via.placeholder.com/80/1a1a1a/666?text=No+Image'}" alt="${p.name}" 
+                             style="cursor:pointer;" onclick="document.getElementById('bulkInput_${p.id}').click()">
+                        <div class="bulk-name">${p.name}</div>
+                        <input type="file" id="bulkInput_${p.id}" accept="image/*" style="display:none;" 
+                               onchange="handleBulkFileSelect('${p.id}', this)">
+                        <span class="bulk-status pending" id="bulkStatus_${p.id}">En attente</span>
+                    </div>
+                `).join('');
         }
+
+        // ================================================================
+        //  GESTION BULK UPLOAD
+        // ================================================================
+        let bulkFiles = {};
+
+        window.handleBulkFileSelect = function(productId, input) {
+            const file = input.files[0];
+            if (file) {
+                bulkFiles[productId] = file;
+                const status = document.getElementById(`bulkStatus_${productId}`);
+                status.textContent = 'Sélectionné';
+                status.className = 'bulk-status pending';
+                
+                // Afficher l'aperçu
+                const item = document.querySelector(`.bulk-item[data-id="${productId}"] img`);
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    item.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        };
+
+        $('bulkUploadBtn').addEventListener('click', async () => {
+            if (!isAdmin) { showFlash('⚠️ Vous devez être administrateur.', 2000); return; }
+            
+            const files = Object.keys(bulkFiles);
+            if (files.length === 0) {
+                showFlash('⚠️ Veuillez sélectionner au moins une image.', 2000);
+                return;
+            }
+
+            const btn = $('bulkUploadBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="loading-spinner"></span> Upload en cours...';
+
+            let uploaded = 0;
+            let errors = 0;
+
+            for (const productId of files) {
+                try {
+                    const file = bulkFiles[productId];
+                    const status = document.getElementById(`bulkStatus_${productId}`);
+                    status.textContent = 'Upload...';
+                    status.className = 'bulk-status pending';
+                    
+                    const url = await uploadImageToStorage(file, productId);
+                    
+                    if (url) {
+                        await db.collection('products').doc(productId).update({ 
+                            image: url,
+                            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                        });
+                        status.textContent = '✅ Uploadé';
+                        status.className = 'bulk-status uploaded';
+                        uploaded++;
+                    } else {
+                        status.textContent = '❌ Erreur';
+                        status.className = 'bulk-status error';
+                        errors++;
+                    }
+                } catch (error) {
+                    console.error('❌ Erreur upload pour', productId, error);
+                    const status = document.getElementById(`bulkStatus_${productId}`);
+                    status.textContent = '❌ Erreur';
+                    status.className = 'bulk-status error';
+                    errors++;
+                }
+            }
+
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-cloud-upload-alt"></i> Uploader toutes les images sélectionnées';
+            
+            showFlash(`✅ ${uploaded} images uploadées, ${errors} erreurs.`, 3000);
+            
+            // Recharger les produits pour mettre à jour les images
+            await loadProducts();
+            
+            // Vider le cache des fichiers
+            bulkFiles = {};
+        });
 
         // ================================================================
         //  FORMULAIRE ADMIN
@@ -2349,12 +2512,12 @@
             const name = $('adminProductName').value.trim();
             const category = $('adminProductCategory').value;
             const brand = $('adminProductBrand').value.trim();
-            const price = parseFloat($('adminProductPrice').value);
-            const stock = parseInt($('adminProductStock').value);
+            const price = parseFloat($('adminProductPrice').value) || 0;
+            const stock = parseInt($('adminProductStock').value) || 0;
             const badge = $('adminProductBadge').value;
             const description = $('adminProductDescription').value.trim();
 
-            if (!name || !category || !brand || isNaN(price) || isNaN(stock) || price <= 0 || stock < 0) {
+            if (!name || !category || !brand || stock < 0) {
                 showFlash('⚠️ Veuillez remplir tous les champs correctement.', 2000);
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = '<i class="fas fa-save"></i> Enregistrer le produit';
@@ -2364,9 +2527,20 @@
             try {
                 let imageUrl = $('adminProductImage').dataset.existingUrl || '';
                 if (selectedFile) {
-                    imageUrl = await uploadImageToStorage(selectedFile);
+                    const productId = id || Date.now().toString();
+                    imageUrl = await uploadImageToStorage(selectedFile, productId);
                 }
-                const productData = { name, category, brand, price, stock, image: imageUrl, badge, description, updatedAt: firebase.firestore.FieldValue.serverTimestamp() };
+                const productData = { 
+                    name, 
+                    category, 
+                    brand, 
+                    price, 
+                    stock, 
+                    image: imageUrl || '', 
+                    badge, 
+                    description, 
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp() 
+                };
                 if (id) {
                     await db.collection('products').doc(id).update(productData);
                     showFlash('✅ Produit modifié !', 2000);
@@ -2400,7 +2574,7 @@
             $('adminProductName').value = product.name;
             $('adminProductCategory').value = product.category;
             $('adminProductBrand').value = product.brand;
-            $('adminProductPrice').value = product.price;
+            $('adminProductPrice').value = product.price || '';
             $('adminProductStock').value = product.stock;
             $('adminProductBadge').value = product.badge || '';
             $('adminProductDescription').value = product.description || '';
@@ -2422,7 +2596,6 @@
             if (!isAdmin) { showFlash('⚠️ Vous devez être administrateur.', 2000); return; }
             if (!confirm('Supprimer définitivement ce produit ?')) return;
             try {
-                const product = products.find(p => p.id === id);
                 await db.collection('products').doc(id).delete();
                 showFlash('🗑️ Produit supprimé.', 1500);
                 await loadProducts();
@@ -2456,7 +2629,7 @@
                         <div class="product-info">
                             <h3>${p.name}</h3>
                             <div class="product-brand-name">${p.brand}</div>
-                            <div class="product-price">${p.price} $ <small>USD</small></div>
+                            <div class="product-price">${p.price || 'À définir'} $ <small>USD</small></div>
                             <button class="add-to-cart-btn" data-id="${p.id}"><i class="fas fa-plus"></i> Ajouter au panier</button>
                         </div>
                     </div>
@@ -2564,8 +2737,8 @@
             }
             let total = 0;
             container.innerHTML = cart.map(item => {
-                total += item.price * item.qty;
-                return `<div class="cart-item"><div style="width:60px;height:60px;background:#eae5de;display:flex;align-items:center;justify-content:center;border-radius:6px;font-size:28px;color:#a79e92;">${item.image ? `<img src="${item.image}" alt="${item.name}">` : `<i class="fas fa-tshirt"></i>`}</div><div class="cart-item-details"><h5>${item.name}</h5><div style="font-size:12px;color:#888;">${item.brand}</div><div class="cart-item-price">${item.price} $</div></div><div class="cart-item-qty"><button onclick="updateQty('${item.id}', -1)">−</button><span>${item.qty}</span><button onclick="updateQty('${item.id}', 1)">+</button></div><span class="remove-item" onclick="removeFromCart('${item.id}')"><i class="fas fa-times"></i></span></div>`;
+                total += (item.price || 0) * item.qty;
+                return `<div class="cart-item"><div style="width:60px;height:60px;background:#eae5de;display:flex;align-items:center;justify-content:center;border-radius:6px;font-size:28px;color:#a79e92;">${item.image ? `<img src="${item.image}" alt="${item.name}">` : `<i class="fas fa-tshirt"></i>`}</div><div class="cart-item-details"><h5>${item.name}</h5><div style="font-size:12px;color:#888;">${item.brand}</div><div class="cart-item-price">${item.price || 'À définir'} $</div></div><div class="cart-item-qty"><button onclick="updateQty('${item.id}', -1)">−</button><span>${item.qty}</span><button onclick="updateQty('${item.id}', 1)">+</button></div><span class="remove-item" onclick="removeFromCart('${item.id}')"><i class="fas fa-times"></i></span></div>`;
             }).join('');
             totalEl.textContent = `Total : ${total.toFixed(2)} $`;
         }
@@ -2575,7 +2748,7 @@
         // ================================================================
         $('payBtn').addEventListener('click', async () => {
             if (cart.length === 0) { showFlash('⚠️ Panier vide.', 2000); return; }
-            const total = cart.reduce((sum, i) => sum + i.price * i.qty, 0);
+            const total = cart.reduce((sum, i) => sum + (i.price || 0) * i.qty, 0);
             const method = document.querySelector('.payment-method.selected');
             const methodName = method ? method.dataset.method : 'Airtel Money';
             showFlash(`⏳ Traitement...`, 2000);
@@ -2611,10 +2784,9 @@
         // ================================================================
         async function renderAdmin() {
             if (!isAdmin) return;
-            console.log('📊 Rendu du dashboard...');
             
             const totalProducts = products.length;
-            const totalStock = products.reduce((sum, p) => sum + p.stock, 0);
+            const totalStock = products.reduce((sum, p) => sum + (p.stock || 0), 0);
             
             try {
                 const ordersSnapshot = await db.collection('orders').orderBy('createdAt', 'desc').get();
@@ -2652,7 +2824,7 @@
                         <td><strong>${p.name}</strong> ${p.badge ? `<span style="background:var(--gold);padding:2px 10px;border-radius:12px;font-size:11px;margin-left:6px;">${p.badge}</span>` : ''}</td>
                         <td>${p.category}</td>
                         <td>${p.brand}</td>
-                        <td>${p.price} $</td>
+                        <td>${p.price || 'À définir'} $</td>
                         <td>${p.stock}</td>
                         <td class="admin-actions">
                             <i class="fas fa-edit" data-id="${p.id}" title="Modifier"></i>
@@ -2668,32 +2840,6 @@
                 btn.addEventListener('click', () => { const id = btn.dataset.id; deleteProduct(id); });
             });
         }
-
-        // ================================================================
-        //  NOTIFICATIONS EN TEMPS RÉEL
-        // ================================================================
-        db.collection('notifications')
-            .orderBy('createdAt', 'desc')
-            .limit(10)
-            .onSnapshot((snapshot) => {
-                if (isAdmin) {
-                    notifications = [];
-                    snapshot.forEach(doc => { notifications.push({ id: doc.id, ...doc.data() }); });
-                    const notifList = $('notifList');
-                    const notifCount = $('notifCount');
-                    notifCount.textContent = notifications.length;
-                    if (notifications.length === 0) {
-                        notifList.innerHTML = `<div style="color:#999; text-align:center; padding:15px;">Aucune notification</div>`;
-                    } else {
-                        notifList.innerHTML = notifications.map(n => `
-                                <div class="notif-item">
-                                    <span>${n.message}</span>
-                                    <span class="notif-time">${n.time || new Date(n.createdAt?.toDate()).toLocaleString() || 'N/A'}</span>
-                                </div>
-                            `).join('');
-                    }
-                }
-            });
 
         // ================================================================
         //  AFFICHAGE DE LA BOUTIQUE
@@ -2763,25 +2909,28 @@
         }
 
         // ================================================================
-        //  INIT - SIMPLIFIÉ ET CORRIGÉ
+        //  INIT
         // ================================================================
         async function init() {
             console.log('🚀 INITIALISATION DE L\'APPLICATION...');
             console.log('========================================');
             
-            // ÉTAPE 1: Initialiser Firestore
             console.log('📌 ÉTAPE 1: Initialisation de Firestore...');
             await initializeFirestore();
             
-            // ÉTAPE 2: Charger les produits
             console.log('📌 ÉTAPE 2: Chargement des produits...');
             await loadProducts();
             updateCartUI();
             
             console.log('========================================');
             console.log('✅ APPLICATION PRÊTE !');
+            console.log(`📦 ${products.length} produits chargés`);
             console.log('👑 Admin: admin@dlt.com / admin123');
-            console.log('📌 Cliquez sur "Admin" pour vous connecter.');
+            console.log('📌 Pour ajouter des images:');
+            console.log('   1. Connectez-vous en tant qu\'admin');
+            console.log('   2. Dans la section "Gestion des images", cliquez sur une image');
+            console.log('   3. Sélectionnez l\'image correspondante');
+            console.log('   4. Cliquez sur "Uploader toutes les images sélectionnées"');
             console.log('========================================');
         }
 
