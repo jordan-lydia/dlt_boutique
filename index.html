@@ -24,7 +24,7 @@
             --dark-soft: #1a1a1a;
             --light-bg: #faf8f6;
             --card-shadow: 0 8px 30px rgba(0,0,0,0.08);
-            --transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            --transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             --font-serif: 'Georgia', 'Times New Roman', serif;
         }
 
@@ -674,8 +674,11 @@
             left: 50%;
             transform: translateX(-50%);
             display: flex;
-            gap: 12px;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
             z-index: 10;
+            max-width: 90%;
         }
 
         .carousel-indicators .dot {
@@ -1620,6 +1623,11 @@
                 max-width: 100%;
                 padding: 80px 20px 30px;
             }
+
+            .carousel-indicators .dot {
+                width: 10px;
+                height: 10px;
+            }
         }
 
         @media (max-width: 480px) {
@@ -1721,7 +1729,7 @@
                 <div class="logo-icon">DLT</div>
                 <div class="logo-text">
                     <span class="brand"><span>DLT</span> BOUTIQUE</span>
-                    <span class="sub">KASHIPUSE · EST. 2026</span>
+                    <span class="sub">KASHIPUSE ·</span>
                 </div>
             </div>
 
@@ -1795,22 +1803,22 @@
     </div>
 
     <!-- ============================================================
-    HERO / ACCUEIL - CARROUSEL
+    HERO / ACCUEIL - CARROUSEL (15 images)
     ============================================================ -->
     <section class="hero-section" id="heroSection">
         <!-- Carrousel -->
         <div class="hero-carousel" id="heroCarousel">
             <!-- Slide 1 -->
-            <div class="slide active" style="background-image: url('carrousel (1).jpeg');">
+            <div class="slide active" style="background-image: url('carrousel (1).png');">
                 <div class="slide-content">
                     <div class="container" style="width:100%;">
                         <div class="hero-content" style="min-height:70vh;">
                             <div class="hero-text">
-                                <div class="atelier">Atelier Paris</div>
-                                <h1>Collection<br><span>Exclusive</span></h1>
-                                <p class="hero-subtitle">La Boutique</p>
+                                <div class="atelier"></div>
+                                <h1>Collection<br><span></span></h1>
+                                <p class="hero-subtitle"></p>
                                 <p class="hero-description">
-                                    Découvrez notre sélection <strong>Haute Gamme</strong> de vêtements pour hommes.
+                                    Découvrez notre sélection <strong>Haute Gamme</strong> de vêtements pour hommes et femme.
                                     Chaque pièce est soigneusement choisie pour incarner le <strong>luxe</strong>,
                                     le <strong>savoir-faire</strong> et l'<strong>élégance intemporelle</strong>.
                                 </p>
@@ -1828,10 +1836,10 @@
                                     <div class="ring-ornament"></div>
                                     <div class="ring-ornament"></div>
                                     <div class="big-logo">
-                                        DLT
-                                        <span>BOUTIQUE</span>
+                                        
+                                        <span></span>
                                     </div>
-                                    <div class="established">KASHIPUSE · 2026</div>
+                                    <div class="established"></div>
                                 </div>
                             </div>
                         </div>
@@ -1882,11 +1890,11 @@
                         <div class="hero-content" style="min-height:70vh;">
                             <div class="hero-text">
                                 <div class="atelier">Atelier Paris</div>
-                                <h1>Élégance<br><span>Intemporelle</span></h1>
-                                <p class="hero-subtitle">Depuis 2026</p>
+                                <h1>Style<br><span>Authentique</span></h1>
+                                <p class="hero-subtitle">L'Excellence</p>
                                 <p class="hero-description">
-                                    DLT Boutique incarne le raffinement à la française. Une signature unique
-                                    pour l'homme moderne qui recherche l'excellence.
+                                    Des pièces uniques qui racontent une histoire. Chaque vêtement est conçu
+                                    pour l'homme qui ose se démarquer avec <strong>élégance</strong>.
                                 </p>
                                 <div class="hero-buttons">
                                     <button class="btn-primary" id="seeCollectionBtn3">
@@ -1919,11 +1927,11 @@
                         <div class="hero-content" style="min-height:70vh;">
                             <div class="hero-text">
                                 <div class="atelier">Atelier Paris</div>
-                                <h1>Style<br><span>Authentique</span></h1>
-                                <p class="hero-subtitle">L'Excellence</p>
+                                <h1>Luxe<br><span>Moderne</span></h1>
+                                <p class="hero-subtitle">L'Élégance</p>
                                 <p class="hero-description">
-                                    Des pièces uniques qui racontent une histoire. Chaque vêtement est conçu
-                                    pour l'homme qui ose se démarquer avec <strong>élégance</strong>.
+                                    Alliez le raffinement traditionnel à une coupe contemporaine.
+                                    Découvrez des vêtements qui subliment <strong>votre silhouette</strong>.
                                 </p>
                                 <div class="hero-buttons">
                                     <button class="btn-primary" id="seeCollectionBtn4">
@@ -1956,11 +1964,11 @@
                         <div class="hero-content" style="min-height:70vh;">
                             <div class="hero-text">
                                 <div class="atelier">Atelier Paris</div>
-                                <h1>Luxe<br><span>Moderne</span></h1>
-                                <p class="hero-subtitle">L'Élégance</p>
+                                <h1>Élégance<br><span>Intemporelle</span></h1>
+                                <p class="hero-subtitle">Depuis 2026</p>
                                 <p class="hero-description">
-                                    Alliez le raffinement traditionnel à une coupe contemporaine.
-                                    Découvrez des vêtements qui subliment <strong>votre silhouette</strong>.
+                                    DLT Boutique incarne le raffinement à la française. Une signature unique
+                                    pour l'homme moderne qui recherche l'excellence.
                                 </p>
                                 <div class="hero-buttons">
                                     <button class="btn-primary" id="seeCollectionBtn5">
@@ -1986,15 +1994,395 @@
                     </div>
                 </div>
             </div>
+            <!-- Slide 6 -->
+            <div class="slide" style="background-image: url('carrousel (6).jpeg');">
+                <div class="slide-content">
+                    <div class="container" style="width:100%;">
+                        <div class="hero-content" style="min-height:70vh;">
+                            <div class="hero-text">
+                                <div class="atelier">Atelier Paris</div>
+                                <h1>L'Art du<br><span>Détail</span></h1>
+                                <p class="hero-subtitle">La Perfection</p>
+                                <p class="hero-description">
+                                    Chaque couture, chaque bouton, chaque tissu est choisi avec une
+                                    <strong>précision</strong> digne des plus grandes maisons.
+                                </p>
+                                <div class="hero-buttons">
+                                    <button class="btn-primary" id="seeCollectionBtn6">
+                                        <i class="fas fa-arrow-right"></i> Voir la collection
+                                    </button>
+                                    <button class="btn-secondary" id="scrollToShopBtn6">
+                                        <i class="fas fa-store"></i> Explorer
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="hero-visual">
+                                <div class="hero-logo-display">
+                                    <div class="ring-ornament"></div>
+                                    <div class="ring-ornament"></div>
+                                    <div class="big-logo">
+                                        DLT
+                                        <span>BOUTIQUE</span>
+                                    </div>
+                                    <div class="established">KASHIPUSE · 2026</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Slide 7 -->
+            <div class="slide" style="background-image: url('carrousel (7).jpeg');">
+                <div class="slide-content">
+                    <div class="container" style="width:100%;">
+                        <div class="hero-content" style="min-height:70vh;">
+                            <div class="hero-text">
+                                <div class="atelier">Atelier Paris</div>
+                                <h1>Style<br><span>Parisien</span></h1>
+                                <p class="hero-subtitle">L'Élégance</p>
+                                <p class="hero-description">
+                                    Inspiré des plus grandes silhouettes parisiennes, notre collection
+                                    allie <strong>modernité</strong> et <strong>tradition</strong>.
+                                </p>
+                                <div class="hero-buttons">
+                                    <button class="btn-primary" id="seeCollectionBtn7">
+                                        <i class="fas fa-arrow-right"></i> Voir la collection
+                                    </button>
+                                    <button class="btn-secondary" id="scrollToShopBtn7">
+                                        <i class="fas fa-store"></i> Explorer
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="hero-visual">
+                                <div class="hero-logo-display">
+                                    <div class="ring-ornament"></div>
+                                    <div class="ring-ornament"></div>
+                                    <div class="big-logo">
+                                        DLT
+                                        <span>BOUTIQUE</span>
+                                    </div>
+                                    <div class="established">KASHIPUSE · 2026</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Slide 8 -->
+            <div class="slide" style="background-image: url('carrousel (8).jpeg');">
+                <div class="slide-content">
+                    <div class="container" style="width:100%;">
+                        <div class="hero-content" style="min-height:70vh;">
+                            <div class="hero-text">
+                                <div class="atelier">Atelier Paris</div>
+                                <h1>Luxe<br><span>Responsable</span></h1>
+                                <p class="hero-subtitle">L'Éthique</p>
+                                <p class="hero-description">
+                                    Des matières nobles et durables, sélectionnées avec soin pour
+                                    un <strong>élégance</strong> qui respecte la planète.
+                                </p>
+                                <div class="hero-buttons">
+                                    <button class="btn-primary" id="seeCollectionBtn8">
+                                        <i class="fas fa-arrow-right"></i> Voir la collection
+                                    </button>
+                                    <button class="btn-secondary" id="scrollToShopBtn8">
+                                        <i class="fas fa-store"></i> Explorer
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="hero-visual">
+                                <div class="hero-logo-display">
+                                    <div class="ring-ornament"></div>
+                                    <div class="ring-ornament"></div>
+                                    <div class="big-logo">
+                                        DLT
+                                        <span>BOUTIQUE</span>
+                                    </div>
+                                    <div class="established">KASHIPUSE · 2026</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Slide 9 -->
+            <div class="slide" style="background-image: url('carrousel (9).jpeg');">
+                <div class="slide-content">
+                    <div class="container" style="width:100%;">
+                        <div class="hero-content" style="min-height:70vh;">
+                            <div class="hero-text">
+                                <div class="atelier">Atelier Paris</div>
+                                <h1>L'Art<br><span>du Sur-Mesure</span></h1>
+                                <p class="hero-subtitle">L'Excellence</p>
+                                <p class="hero-description">
+                                    Des vêtements conçus pour vous, avec une <strong>attention</strong>
+                                    particulière à chaque détail pour une silhouette parfaite.
+                                </p>
+                                <div class="hero-buttons">
+                                    <button class="btn-primary" id="seeCollectionBtn9">
+                                        <i class="fas fa-arrow-right"></i> Voir la collection
+                                    </button>
+                                    <button class="btn-secondary" id="scrollToShopBtn9">
+                                        <i class="fas fa-store"></i> Explorer
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="hero-visual">
+                                <div class="hero-logo-display">
+                                    <div class="ring-ornament"></div>
+                                    <div class="ring-ornament"></div>
+                                    <div class="big-logo">
+                                        DLT
+                                        <span>BOUTIQUE</span>
+                                    </div>
+                                    <div class="established">KASHIPUSE · 2026</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Slide 10 -->
+            <div class="slide" style="background-image: url('carrousel (10).jpeg');">
+                <div class="slide-content">
+                    <div class="container" style="width:100%;">
+                        <div class="hero-content" style="min-height:70vh;">
+                            <div class="hero-text">
+                                <div class="atelier">Atelier Paris</div>
+                                <h1>Élégance<br><span>Moderne</span></h1>
+                                <p class="hero-subtitle">Le Style</p>
+                                <p class="hero-description">
+                                    Une vision contemporaine du luxe, où chaque pièce est conçue
+                                    pour <strong>sublimer</strong> l'homme d'aujourd'hui.
+                                </p>
+                                <div class="hero-buttons">
+                                    <button class="btn-primary" id="seeCollectionBtn10">
+                                        <i class="fas fa-arrow-right"></i> Voir la collection
+                                    </button>
+                                    <button class="btn-secondary" id="scrollToShopBtn10">
+                                        <i class="fas fa-store"></i> Explorer
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="hero-visual">
+                                <div class="hero-logo-display">
+                                    <div class="ring-ornament"></div>
+                                    <div class="ring-ornament"></div>
+                                    <div class="big-logo">
+                                        DLT
+                                        <span>BOUTIQUE</span>
+                                    </div>
+                                    <div class="established">KASHIPUSE · 2026</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Slide 11 -->
+            <div class="slide" style="background-image: url('carrousel (11).jpeg');">
+                <div class="slide-content">
+                    <div class="container" style="width:100%;">
+                        <div class="hero-content" style="min-height:70vh;">
+                            <div class="hero-text">
+                                <div class="atelier">Atelier Paris</div>
+                                <h1>Collection<br><span>Privée</span></h1>
+                                <p class="hero-subtitle">L'Exclusivité</p>
+                                <p class="hero-description">
+                                    Une sélection limitée de pièces <strong>uniques</strong>,
+                                    conçues pour ceux qui recherchent l'exception.
+                                </p>
+                                <div class="hero-buttons">
+                                    <button class="btn-primary" id="seeCollectionBtn11">
+                                        <i class="fas fa-arrow-right"></i> Voir la collection
+                                    </button>
+                                    <button class="btn-secondary" id="scrollToShopBtn11">
+                                        <i class="fas fa-store"></i> Explorer
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="hero-visual">
+                                <div class="hero-logo-display">
+                                    <div class="ring-ornament"></div>
+                                    <div class="ring-ornament"></div>
+                                    <div class="big-logo">
+                                        DLT
+                                        <span>BOUTIQUE</span>
+                                    </div>
+                                    <div class="established">KASHIPUSE · 2026</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Slide 12 -->
+            <div class="slide" style="background-image: url('carrousel (12).jpeg');">
+                <div class="slide-content">
+                    <div class="container" style="width:100%;">
+                        <div class="hero-content" style="min-height:70vh;">
+                            <div class="hero-text">
+                                <div class="atelier">Atelier Paris</div>
+                                <h1>L'Art de<br><span>Vivre</span></h1>
+                                <p class="hero-subtitle">L'Élégance</p>
+                                <p class="hero-description">
+                                    Plus qu'un vêtement, une <strong>philosophie</strong>.
+                                    L'élégance est un art de vivre que nous cultivons.
+                                </p>
+                                <div class="hero-buttons">
+                                    <button class="btn-primary" id="seeCollectionBtn12">
+                                        <i class="fas fa-arrow-right"></i> Voir la collection
+                                    </button>
+                                    <button class="btn-secondary" id="scrollToShopBtn12">
+                                        <i class="fas fa-store"></i> Explorer
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="hero-visual">
+                                <div class="hero-logo-display">
+                                    <div class="ring-ornament"></div>
+                                    <div class="ring-ornament"></div>
+                                    <div class="big-logo">
+                                        DLT
+                                        <span>BOUTIQUE</span>
+                                    </div>
+                                    <div class="established">KASHIPUSE · 2026</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Slide 13 -->
+            <div class="slide" style="background-image: url('carrousel (13).jpeg');">
+                <div class="slide-content">
+                    <div class="container" style="width:100%;">
+                        <div class="hero-content" style="min-height:70vh;">
+                            <div class="hero-text">
+                                <div class="atelier">Atelier Paris</div>
+                                <h1>Style<br><span>Distingué</span></h1>
+                                <p class="hero-subtitle">La Classe</p>
+                                <p class="hero-description">
+                                    Des pièces qui parlent d'<strong>élégance</strong> sans jamais
+                                    en faire trop. Le luxe dans la sobriété.
+                                </p>
+                                <div class="hero-buttons">
+                                    <button class="btn-primary" id="seeCollectionBtn13">
+                                        <i class="fas fa-arrow-right"></i> Voir la collection
+                                    </button>
+                                    <button class="btn-secondary" id="scrollToShopBtn13">
+                                        <i class="fas fa-store"></i> Explorer
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="hero-visual">
+                                <div class="hero-logo-display">
+                                    <div class="ring-ornament"></div>
+                                    <div class="ring-ornament"></div>
+                                    <div class="big-logo">
+                                        DLT
+                                        <span>BOUTIQUE</span>
+                                    </div>
+                                    <div class="established">KASHIPUSE · 2026</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Slide 14 -->
+            <div class="slide" style="background-image: url('carrousel (14).jpeg');">
+                <div class="slide-content">
+                    <div class="container" style="width:100%;">
+                        <div class="hero-content" style="min-height:70vh;">
+                            <div class="hero-text">
+                                <div class="atelier">Atelier Paris</div>
+                                <h1>Luxe<br><span>Authentique</span></h1>
+                                <p class="hero-subtitle">L'Excellence</p>
+                                <p class="hero-description">
+                                    Le véritable luxe est dans l'<strong>authenticité</strong>
+                                    des matières et la qualité des finitions.
+                                </p>
+                                <div class="hero-buttons">
+                                    <button class="btn-primary" id="seeCollectionBtn14">
+                                        <i class="fas fa-arrow-right"></i> Voir la collection
+                                    </button>
+                                    <button class="btn-secondary" id="scrollToShopBtn14">
+                                        <i class="fas fa-store"></i> Explorer
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="hero-visual">
+                                <div class="hero-logo-display">
+                                    <div class="ring-ornament"></div>
+                                    <div class="ring-ornament"></div>
+                                    <div class="big-logo">
+                                        DLT
+                                        <span>BOUTIQUE</span>
+                                    </div>
+                                    <div class="established">KASHIPUSE · 2026</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Slide 15 -->
+            <div class="slide" style="background-image: url('carrousel (15).jpeg');">
+                <div class="slide-content">
+                    <div class="container" style="width:100%;">
+                        <div class="hero-content" style="min-height:70vh;">
+                            <div class="hero-text">
+                                <div class="atelier">Atelier Paris</div>
+                                <h1>Élégance<br><span>Éternelle</span></h1>
+                                <p class="hero-subtitle">La Signature</p>
+                                <p class="hero-description">
+                                    DLT Boutique, une <strong>signature</strong> unique pour
+                                    l'homme qui cherche l'excellence et l'éternel.
+                                </p>
+                                <div class="hero-buttons">
+                                    <button class="btn-primary" id="seeCollectionBtn15">
+                                        <i class="fas fa-arrow-right"></i> Voir la collection
+                                    </button>
+                                    <button class="btn-secondary" id="scrollToShopBtn15">
+                                        <i class="fas fa-store"></i> Explorer
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="hero-visual">
+                                <div class="hero-logo-display">
+                                    <div class="ring-ornament"></div>
+                                    <div class="ring-ornament"></div>
+                                    <div class="big-logo">
+                                        DLT
+                                        <span>BOUTIQUE</span>
+                                    </div>
+                                    <div class="established">KASHIPUSE · 2026</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <!-- Indicateurs -->
+        <!-- Indicateurs (15 dots) -->
         <div class="carousel-indicators" id="carouselIndicators">
             <span class="dot active" data-index="0"></span>
             <span class="dot" data-index="1"></span>
             <span class="dot" data-index="2"></span>
             <span class="dot" data-index="3"></span>
             <span class="dot" data-index="4"></span>
+            <span class="dot" data-index="5"></span>
+            <span class="dot" data-index="6"></span>
+            <span class="dot" data-index="7"></span>
+            <span class="dot" data-index="8"></span>
+            <span class="dot" data-index="9"></span>
+            <span class="dot" data-index="10"></span>
+            <span class="dot" data-index="11"></span>
+            <span class="dot" data-index="12"></span>
+            <span class="dot" data-index="13"></span>
+            <span class="dot" data-index="14"></span>
         </div>
 
         <!-- Flèches -->
@@ -2201,7 +2589,7 @@
         });
 
         // ================================================================
-        //  CARROUSEL
+        //  CARROUSEL - 15 images
         // ================================================================
         const slides = document.querySelectorAll('.hero-carousel .slide');
         const dots = document.querySelectorAll('.carousel-indicators .dot');
@@ -2227,7 +2615,7 @@
         }
 
         function startCarousel() {
-            slideInterval = setInterval(nextSlide, 6000);
+            slideInterval = setInterval(nextSlide, 5000);
         }
 
         function resetCarousel() {
@@ -2921,8 +3309,9 @@
         console.log('👔 DLT BOUTIQUE - Atelier Paris');
         console.log('📦 Données stockées dans localStorage.');
         console.log('👑 Admin: admin@dlt.com / admin123');
-        console.log('🖼️ Carrousel avec 5 images personnalisées');
-        console.log('📸 Images: carrousel (1).jpeg à carrousel (5).jpeg');
+        console.log('🍔 Menu hamburger activé sur mobile et tablette');
+        console.log('🖼️ Carrousel avec 15 images personnalisées');
+        console.log('📸 Images: carrousel (1) à (15).jpeg');
     </script>
 
 </body>
