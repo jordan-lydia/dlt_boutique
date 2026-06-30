@@ -1786,8 +1786,8 @@
                     <option value="accessoire">Accessoire</option>
                 </select>
                 <input type="text" id="adminProductBrand" placeholder="Marque (ex: Armani, Hugo Boss...)" required>
-                <input type="number" id="adminProductPrice" placeholder="Prix (USD)" step="0.01">
-                <input type="number" id="adminProductStock" placeholder="Stock">
+                <input type="number" id="adminProductPrice" placeholder="Prix (USD)" step="0.01" required>
+                <input type="number" id="adminProductStock" placeholder="Stock" required>
                 <div class="full-width">
                     <div class="file-upload-wrapper">
                         <div class="file-upload-label">
@@ -1839,7 +1839,7 @@
     <div class="flash-message" id="flashMessage"></div>
 
     <!-- ============================================================
-    JAVASCRIPT
+    JAVASCRIPT - CORRIGÉ
     ============================================================ -->
     <script>
         // ================================================================
@@ -1873,121 +1873,6 @@
         console.log('✅ Firebase Analytics initialisé');
 
         // ================================================================
-        //  URL DE BASE GITHUB PAGES
-        // ================================================================
-        const GITHUB_BASE_URL = 'https://jordan-lydia.github.io/dlt_boutique/';
-
-        // ================================================================
-        //  DONNÉES DES IMAGES PAR CATÉGORIE (chemins relatifs GitHub Pages)
-        // ================================================================
-        const productImages = {
-            accessoire: [
-                'ACCESSOIRE/VESTE (1).jpeg',
-                'ACCESSOIRE/VESTE (2).jpeg',
-                'ACCESSOIRE/VESTE (3).jpeg',
-                'ACCESSOIRE/VESTE (4).jpeg',
-                'ACCESSOIRE/VESTE (5).jpeg',
-                'ACCESSOIRE/VESTE (6).jpeg'
-            ],
-            chaussure: [
-                'CHAUSSURE/chaussire (1).jpeg',
-                'CHAUSSURE/chaussire (2).jpeg',
-                'CHAUSSURE/chaussire (3).jpeg',
-                'CHAUSSURE/chaussire (4).jpeg',
-                'CHAUSSURE/chaussire (5).jpeg',
-                'CHAUSSURE/chaussire (6).jpeg',
-                'CHAUSSURE/chaussire (7).jpeg',
-                'CHAUSSURE/chaussire (8).jpeg',
-                'CHAUSSURE/chaussire (9).jpeg',
-                'CHAUSSURE/chaussire (10).jpeg',
-                'CHAUSSURE/chaussire (11).jpeg'
-            ],
-            chemise: [
-                'CHEMISE/chemise (1).jpeg',
-                'CHEMISE/chemise (2).jpeg',
-                'CHEMISE/chemise (3).jpeg',
-                'CHEMISE/chemise (4).jpeg',
-                'CHEMISE/chemise (5).jpeg',
-                'CHEMISE/chemise (6).jpeg',
-                'CHEMISE/chemise (7).jpeg',
-                'CHEMISE/chemise (8).jpeg',
-                'CHEMISE/chemise (9).jpeg',
-                'CHEMISE/chemise (10).jpeg',
-                'CHEMISE/chemise (11).jpeg'
-            ],
-            mariage: [
-                'MARIAGE/mariage (1).jpeg',
-                'MARIAGE/mariage (2).jpeg',
-                'MARIAGE/mariage (3).jpeg',
-                'MARIAGE/mariage (4).jpeg',
-                'MARIAGE/mariage (5).jpeg',
-                'MARIAGE/mariage (6).jpeg',
-                'MARIAGE/mariage (7).jpeg'
-            ],
-            pantalon: [
-                'PANTALON/pantalon (1).jpeg',
-                'PANTALON/pantalon (2).jpeg',
-                'PANTALON/pantalon (3).jpeg',
-                'PANTALON/pantalon (4).jpeg',
-                'PANTALON/pantalon (5).jpeg',
-                'PANTALON/pantalon (6).jpeg',
-                'PANTALON/pantalon (7).jpeg',
-                'PANTALON/pantalon (8).jpeg',
-                'PANTALON/pantalon (9).jpeg',
-                'PANTALON/pantalon (10).jpeg',
-                'PANTALON/pantalon (11).jpeg',
-                'PANTALON/pantalon (12).jpeg'
-            ],
-            polo: [
-                'POLO/polo (1).jpeg',
-                'POLO/polo (2).jpeg',
-                'POLO/polo (3).jpeg',
-                'POLO/polo (4).jpeg',
-                'POLO/polo (5).jpeg',
-                'POLO/polo (6).jpeg',
-                'POLO/polo (7).jpeg',
-                'POLO/polo (8).jpeg',
-                'POLO/polo (9).jpeg',
-                'POLO/polo (10).jpeg',
-                'POLO/polo (11).jpeg',
-                'POLO/polo (12).jpeg',
-                'POLO/polo (13).jpeg',
-                'POLO/polo (14).jpeg'
-            ],
-            veste: [
-                'veste/veste (1).jpeg',
-                'veste/veste (2).jpeg',
-                'veste/veste (3).jpeg',
-                'veste/veste (4).jpeg',
-                'veste/veste (5).jpeg',
-                'veste/veste (6).jpeg',
-                'veste/veste (7).jpeg',
-                'veste/veste (8).jpeg',
-                'veste/veste (9).jpeg',
-                'veste/veste (10).jpeg',
-                'veste/veste (11).jpeg',
-                'veste/veste (12).jpeg',
-                'veste/veste (13).jpeg',
-                'veste/veste (14).jpeg',
-                'veste/veste (15).jpeg',
-                'veste/veste (16).jpeg',
-                'veste/veste (17).jpeg',
-                'veste/veste (18).jpeg',
-                'veste/veste (19).jpeg',
-                'veste/veste (20).jpeg',
-                'veste/veste (21).jpeg',
-                'veste/veste (22).jpeg',
-                'veste/veste (23).jpeg',
-                'veste/veste (24).jpeg',
-                'veste/veste (25).jpeg',
-                'veste/veste (26).jpeg',
-                'veste/veste (27).jpeg',
-                'veste/veste (28).jpeg',
-                'veste/veste (29).jpeg'
-            ]
-        };
-
-        // ================================================================
         //  ÉTAT DE L'APPLICATION
         // ================================================================
         let products = [];
@@ -2009,7 +1894,7 @@
         const flashMsg = $('flashMessage');
 
         // ================================================================
-        //  INITIALISATION FIRESTORE
+        //  RÉINITIALISATION AUTOMATIQUE DE FIRESTORE - SIMPLIFIÉE
         // ================================================================
         async function initializeFirestore() {
             console.log('🔄 Initialisation de Firestore...');
@@ -2022,6 +1907,7 @@
                 if (adminSnapshot.empty) {
                     console.log('👑 Création de l\'admin...');
                     
+                    // Vérifier si l'utilisateur existe déjà dans Auth
                     try {
                         const userCredential = await auth.createUserWithEmailAndPassword('admin@dlt.com', 'admin123');
                         const uid = userCredential.user.uid;
@@ -2054,50 +1940,30 @@
                     console.log('✅ Admin déjà existant');
                 }
 
-                // 2. Vérifier et créer les produits
+                // 2. Vérifier et créer les produits de démonstration
                 console.log('📌 Vérification des produits...');
-                const productsSnapshot = await db.collection('products').get();
+                const productsSnapshot = await db.collection('products').limit(1).get();
                 
                 if (productsSnapshot.empty) {
-                    console.log('📦 Création des produits avec les images GitHub Pages...');
-                    
-                    for (const [category, images] of Object.entries(productImages)) {
-                        const categoryName = {
-                            accessoire: 'Accessoire',
-                            chaussure: 'Chaussure',
-                            chemise: 'Chemise',
-                            mariage: 'Mariage',
-                            pantalon: 'Pantalon',
-                            polo: 'Polo',
-                            veste: 'Veste'
-                        }[category] || category;
-
-                        for (let i = 0; i < images.length; i++) {
-                            const imagePath = images[i];
-                            const fileName = imagePath.split('/').pop().replace('veste (1).jpeg', '').replace('veste (1).jpeg', '');
-                            const productName = `${categoryName} ${fileName}`;
-                            const imageUrl = GITHUB_BASE_URL + imagePath;
-                            
-                            const productData = {
-                                name: productName,
-                                category: category,
-                                brand: 'DLT',
-                                price: 0,
-                                stock: 0,
-                                image: imageUrl,
-                                badge: '',
-                                description: `${categoryName} - ${fileName}`,
-                                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                            };
-                            
-                            await db.collection('products').add(productData);
-                            console.log(`✅ Produit ajouté: ${productName} - ${imageUrl}`);
-                        }
+                    console.log('📦 Création des produits de démonstration...');
+                    const demoProducts = [
+                        { name: 'Veste en Laine Cachemire', category: 'veste', brand: 'Armani', price: 299.99, stock: 15, image: '', badge: 'Exclusif', description: 'Veste en laine cachemire italienne.' },
+                        { name: 'Chemise Oxford Blanc', category: 'chemise', brand: 'Hugo Boss', price: 89.99, stock: 25, image: '', badge: 'Nouveau', description: 'Chemise Oxford en coton égyptien.' },
+                        { name: 'Pantalon Tailleur Gris', category: 'pantalon', brand: 'Zegna', price: 199.99, stock: 12, image: '', badge: 'Premium', description: 'Pantalon de costume en laine peignée.' },
+                        { name: 'Polo Coton Piqué', category: 'polo', brand: 'Lacoste', price: 69.99, stock: 30, image: '', badge: '', description: 'Polo en coton piqué.' },
+                        { name: 'Culotte Chino Bleue', category: 'culotte', brand: 'Dockers', price: 79.99, stock: 20, image: '', badge: '', description: 'Culotte chino en coton stretch.' },
+                        { name: 'Mocassin Cuir Noir', category: 'chaussure', brand: 'Ferragamo', price: 249.99, stock: 8, image: '', badge: 'Exclusif', description: 'Mocassin en cuir de veau noir.' },
+                        { name: 'Costume Mariage Bleu', category: 'mariage', brand: 'Tom Ford', price: 599.99, stock: 5, image: '', badge: 'Premium', description: 'Costume de mariage en laine super 120.' },
+                        { name: 'Cravate Soie Bordeaux', category: 'accessoire', brand: 'Hermès', price: 149.99, stock: 18, image: '', badge: 'Nouveau', description: 'Cravate en soie 100%.' }
+                    ];
+                    for (const product of demoProducts) {
+                        await db.collection('products').add({
+                            ...product,
+                            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                        });
                     }
-                    console.log(`✅ ${Object.values(productImages).flat().length} produits créés`);
-                } else {
-                    console.log(`✅ ${productsSnapshot.size} produits déjà existants`);
+                    console.log('✅ 8 produits créés');
                 }
 
                 // 3. Vérifier et créer une commande de démonstration
@@ -2106,8 +1972,8 @@
                 if (ordersSnapshot.empty) {
                     console.log('📦 Création d\'une commande de démonstration...');
                     await db.collection('orders').add({
-                        items: [{ name: 'Veste DLT 1', brand: 'DLT', price: 0, qty: 1 }],
-                        total: 0,
+                        items: [{ name: 'Veste en Laine Cachemire', brand: 'Armani', price: 299.99, qty: 1 }],
+                        total: 299.99,
                         paymentMethod: 'airtel',
                         status: 'payée',
                         date: new Date().toISOString(),
@@ -2128,7 +1994,7 @@
                         read: false
                     });
                     await db.collection('notifications').add({
-                        message: `📦 ${Object.values(productImages).flat().length} produits disponibles dans la boutique`,
+                        message: '📦 8 produits de démonstration disponibles',
                         time: new Date().toLocaleString(),
                         createdAt: firebase.firestore.FieldValue.serverTimestamp(),
                         read: false
@@ -2146,11 +2012,12 @@
         }
 
         // ================================================================
-        //  AUTHENTIFICATION
+        //  AUTHENTIFICATION - CORRIGÉE
         // ================================================================
         auth.onAuthStateChanged(async (user) => {
             console.log('🔄 onAuthStateChanged:', user ? user.email : 'Aucun utilisateur');
             
+            // Réinitialiser le bouton de connexion
             const loginBtn = $('loginBtn');
             loginBtn.disabled = false;
             loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Se connecter';
@@ -2171,6 +2038,7 @@
                         $('loginOverlay').classList.remove('show');
                         showFlash('👑 Bienvenue dans l\'espace administrateur.', 2000);
                     } else {
+                        // Si c'est admin@dlt.com mais pas dans admins
                         if (user.email === 'admin@dlt.com') {
                             console.log('🔧 Ajout de l\'admin...');
                             await db.collection('admins').doc(user.uid).set({
@@ -2206,7 +2074,7 @@
         });
 
         // ================================================================
-        //  LOGIN
+        //  LOGIN - CORRIGÉ
         // ================================================================
         $('loginBtn').addEventListener('click', async () => {
             const email = $('loginEmail').value.trim();
@@ -2225,8 +2093,11 @@
                 console.log('🔐 Tentative de connexion pour:', email);
                 await auth.signInWithEmailAndPassword(email, password);
                 console.log('✅ Connexion réussie');
+                
+                // La suite est gérée par onAuthStateChanged
                 successEl.textContent = '✅ Connexion réussie !';
                 successEl.style.display = 'block';
+                
             } catch (error) {
                 console.error('❌ Erreur de connexion:', error);
                 
@@ -2286,6 +2157,7 @@
             }
         });
 
+        // Connexion avec Entrée
         document.addEventListener('keypress', (e) => {
             if (e.key === 'Enter' && $('loginOverlay').classList.contains('show')) {
                 $('loginBtn').click();
@@ -2316,7 +2188,7 @@
         menuBackdrop.addEventListener('click', closeMenu);
 
         // ================================================================
-        //  CARROUSEL
+        //  CARROUSEL (version simplifiée)
         // ================================================================
         const carouselImages = [
             'carrousel (1).jpg', 'carrousel (2).jpeg', 'carrousel (3).jpeg',
@@ -2339,7 +2211,7 @@
         carouselImages.slice(0, 5).forEach((img, index) => {
             const slide = document.createElement('div');
             slide.className = `slide ${index === 0 ? 'active' : ''}`;
-            slide.style.backgroundImage = `url('${GITHUB_BASE_URL + img}')`;
+            slide.style.backgroundImage = `url('${img}')`;
             const text = carouselTexts[index % carouselTexts.length];
             slide.innerHTML = `
                     <div class="slide-content">
@@ -2477,13 +2349,13 @@
             const name = $('adminProductName').value.trim();
             const category = $('adminProductCategory').value;
             const brand = $('adminProductBrand').value.trim();
-            const price = $('adminProductPrice').value ? parseFloat($('adminProductPrice').value) : null;
-            const stock = $('adminProductStock').value ? parseInt($('adminProductStock').value) : null;
+            const price = parseFloat($('adminProductPrice').value);
+            const stock = parseInt($('adminProductStock').value);
             const badge = $('adminProductBadge').value;
             const description = $('adminProductDescription').value.trim();
 
-            if (!name || !category || !brand) {
-                showFlash('⚠️ Veuillez remplir les champs obligatoires (Nom, Catégorie, Marque).', 2000);
+            if (!name || !category || !brand || isNaN(price) || isNaN(stock) || price <= 0 || stock < 0) {
+                showFlash('⚠️ Veuillez remplir tous les champs correctement.', 2000);
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = '<i class="fas fa-save"></i> Enregistrer le produit';
                 return;
@@ -2494,17 +2366,7 @@
                 if (selectedFile) {
                     imageUrl = await uploadImageToStorage(selectedFile);
                 }
-                const productData = { 
-                    name, 
-                    category, 
-                    brand, 
-                    price: price !== null ? price : 0,
-                    stock: stock !== null ? stock : 0,
-                    image: imageUrl, 
-                    badge, 
-                    description, 
-                    updatedAt: firebase.firestore.FieldValue.serverTimestamp() 
-                };
+                const productData = { name, category, brand, price, stock, image: imageUrl, badge, description, updatedAt: firebase.firestore.FieldValue.serverTimestamp() };
                 if (id) {
                     await db.collection('products').doc(id).update(productData);
                     showFlash('✅ Produit modifié !', 2000);
@@ -2538,8 +2400,8 @@
             $('adminProductName').value = product.name;
             $('adminProductCategory').value = product.category;
             $('adminProductBrand').value = product.brand;
-            $('adminProductPrice').value = product.price || '';
-            $('adminProductStock').value = product.stock || '';
+            $('adminProductPrice').value = product.price;
+            $('adminProductStock').value = product.stock;
             $('adminProductBadge').value = product.badge || '';
             $('adminProductDescription').value = product.description || '';
             if (product.image) {
@@ -2560,6 +2422,7 @@
             if (!isAdmin) { showFlash('⚠️ Vous devez être administrateur.', 2000); return; }
             if (!confirm('Supprimer définitivement ce produit ?')) return;
             try {
+                const product = products.find(p => p.id === id);
                 await db.collection('products').doc(id).delete();
                 showFlash('🗑️ Produit supprimé.', 1500);
                 await loadProducts();
@@ -2593,7 +2456,7 @@
                         <div class="product-info">
                             <h3>${p.name}</h3>
                             <div class="product-brand-name">${p.brand}</div>
-                            <div class="product-price">${p.price || 0} $ <small>USD</small></div>
+                            <div class="product-price">${p.price} $ <small>USD</small></div>
                             <button class="add-to-cart-btn" data-id="${p.id}"><i class="fas fa-plus"></i> Ajouter au panier</button>
                         </div>
                     </div>
@@ -2751,7 +2614,7 @@
             console.log('📊 Rendu du dashboard...');
             
             const totalProducts = products.length;
-            const totalStock = products.reduce((sum, p) => sum + (p.stock || 0), 0);
+            const totalStock = products.reduce((sum, p) => sum + p.stock, 0);
             
             try {
                 const ordersSnapshot = await db.collection('orders').orderBy('createdAt', 'desc').get();
@@ -2789,8 +2652,8 @@
                         <td><strong>${p.name}</strong> ${p.badge ? `<span style="background:var(--gold);padding:2px 10px;border-radius:12px;font-size:11px;margin-left:6px;">${p.badge}</span>` : ''}</td>
                         <td>${p.category}</td>
                         <td>${p.brand}</td>
-                        <td>${p.price || 0} $</td>
-                        <td>${p.stock || 0}</td>
+                        <td>${p.price} $</td>
+                        <td>${p.stock}</td>
                         <td class="admin-actions">
                             <i class="fas fa-edit" data-id="${p.id}" title="Modifier"></i>
                             <i class="fas fa-trash" data-id="${p.id}" title="Supprimer"></i>
@@ -2900,16 +2763,17 @@
         }
 
         // ================================================================
-        //  INIT
+        //  INIT - SIMPLIFIÉ ET CORRIGÉ
         // ================================================================
         async function init() {
             console.log('🚀 INITIALISATION DE L\'APPLICATION...');
             console.log('========================================');
-            console.log(`📁 Base URL GitHub Pages: ${GITHUB_BASE_URL}`);
             
+            // ÉTAPE 1: Initialiser Firestore
             console.log('📌 ÉTAPE 1: Initialisation de Firestore...');
             await initializeFirestore();
             
+            // ÉTAPE 2: Charger les produits
             console.log('📌 ÉTAPE 2: Chargement des produits...');
             await loadProducts();
             updateCartUI();
@@ -2917,9 +2781,7 @@
             console.log('========================================');
             console.log('✅ APPLICATION PRÊTE !');
             console.log('👑 Admin: admin@dlt.com / admin123');
-            console.log(`📁 Les images sont chargées depuis: ${GITHUB_BASE_URL}`);
             console.log('📌 Cliquez sur "Admin" pour vous connecter.');
-            console.log('📌 Les prix et stocks sont à 0 par défaut - modifiez-les en tant qu\'admin.');
             console.log('========================================');
         }
 
