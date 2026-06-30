@@ -6,10 +6,11 @@
     <title>DLT BOUTIQUE - Atelier Paris</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <!-- Firebase SDKs -->
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-storage-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-analytics-compat.js"></script>
     <style>
         /* ============================================================
            RESET & VARIABLES
@@ -33,6 +34,7 @@
             --font-serif: 'Georgia', 'Times New Roman', serif;
             --danger: #c0392b;
             --success: #27ae60;
+            --warning: #f39c12;
         }
 
         html { scroll-behavior: smooth; }
@@ -1892,12 +1894,8 @@
     HERO / ACCUEIL - CARROUSEL
     ============================================================ -->
     <section class="hero-section" id="heroSection">
-        <div class="hero-carousel" id="heroCarousel">
-            <!-- Slides générés par JavaScript -->
-        </div>
-
+        <div class="hero-carousel" id="heroCarousel"></div>
         <div class="carousel-indicators" id="carouselIndicators"></div>
-
         <div class="carousel-arrows">
             <button id="prevSlide"><i class="fas fa-chevron-left"></i></button>
             <button id="nextSlide"><i class="fas fa-chevron-right"></i></button>
@@ -1908,15 +1906,11 @@
     SHOP SECTION
     ============================================================ -->
     <section id="shopSection">
-
         <section class="categories-section">
             <div class="container">
-                <div class="categories-grid" id="categoriesGrid">
-                    <!-- Généré par JS -->
-                </div>
+                <div class="categories-grid" id="categoriesGrid"></div>
             </div>
         </section>
-
         <section class="gallery-section">
             <div class="container">
                 <div class="gallery-header">
@@ -1925,12 +1919,9 @@
                         <button class="active" data-brand="all">Toutes</button>
                     </div>
                 </div>
-                <div class="product-grid" id="productGrid">
-                    <!-- Généré par JS -->
-                </div>
+                <div class="product-grid" id="productGrid"></div>
             </div>
         </section>
-
     </section>
 
     <!-- ============================================================
@@ -1943,7 +1934,6 @@
         </div>
         <div id="cartItems"></div>
         <div class="cart-total" id="cartTotal">Total : 0 $</div>
-
         <div class="payment-section">
             <h5><i class="fas fa-credit-card"></i> Mode de paiement</h5>
             <div class="payment-methods" id="paymentMethods">
@@ -2071,7 +2061,7 @@
     <div class="flash-message" id="flashMessage"></div>
 
     <!-- ============================================================
-    JAVASCRIPT - FIREBASE & APPLICATION
+    JAVASCRIPT
     ============================================================ -->
     <script>
         // ================================================================
@@ -2080,6 +2070,7 @@
         const firebaseConfig = {
             apiKey: "AIzaSyAXjjfFB74BZ4uPYDrZ6T6c-I91bvszxWc",
             authDomain: "dlt-boutique.firebaseapp.com",
+            databaseURL: "https://dlt-boutique-default-rtdb.firebaseio.com",
             projectId: "dlt-boutique",
             storageBucket: "dlt-boutique.firebasestorage.app",
             messagingSenderId: "573039187938",
@@ -2087,10 +2078,11 @@
             measurementId: "G-S6TP863VWR"
         };
 
-        // Initialisation Firebase
         console.log('🔥 Initialisation de Firebase...');
+
+        // Initialisation Firebase
         firebase.initializeApp(firebaseConfig);
-        console.log('✅ Firebase initialisé avec succès !');
+        console.log('✅ Firebase initialisé');
 
         // Initialisation des services
         const db = firebase.firestore();
@@ -2102,8 +2094,8 @@
         const auth = firebase.auth();
         console.log('✅ Firebase Auth initialisé');
 
-        // Vérification que le Storage est bien configuré
-        console.log('📦 Storage bucket:', storage.ref().bucket);
+        const analytics = firebase.analytics();
+        console.log('✅ Firebase Analytics initialisé');
 
         // ================================================================
         //  ÉTAT DE L'APPLICATION
@@ -2127,46 +2119,99 @@
         const flashMsg = $('flashMessage');
 
         // ================================================================
-        //  TEST DE CONNEXION À FIREBASE
+        //  CRÉATION AUTOMATIQUE DE L'ADMIN
         // ================================================================
-        async function testFirebaseConnection() {
+        async function setupAdmin() {
             try {
-                // Test Firestore
-                await db.collection('products').limit(1).get();
-                console.log('✅ Connexion Firestore réussie !');
-                
-                // Test Storage
-                const testRef = storage.ref('test.txt');
-                console.log('✅ Connexion Storage réussie !');
-                
-                showFlash('🔥 Firebase connecté avec succès !', 2000);
+                console.log('🔧 Vérification de l\'admin...');
+
+                // Vérifier si un admin existe dans Firestore
+                const adminSnapshot = await db.collection('admins').limit(1).get();
+
+                if (adminSnapshot.empty) {
+                    console.log('👑 Aucun admin trouvé, création automatique...');
+
+                    try {
+                        // Créer l'utilisateur admin
+                        const userCredential = await auth.createUserWithEmailAndPassword('admin@dlt.com', 'admin123');
+                        console.log('✅ Compte admin créé');
+
+                        // Ajouter l'UID dans la collection "admins"
+                        await db.collection('admins').doc(userCredential.user.uid).set({
+                            role: 'admin',
+                            email: 'admin@dlt.com',
+                            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                        });
+                        console.log('✅ Admin ajouté à la collection admins');
+                        console.log('👑 Email: admin@dlt.com');
+                        console.log('🔑 Mot de passe: admin123');
+                        showFlash('👑 Admin créé avec succès !', 3000);
+
+                    } catch (createError) {
+                        if (createError.code === 'auth/email-already-in-use') {
+                            console.log('ℹ️ L\'utilisateur admin existe déjà dans Auth');
+                            // Essayer de trouver l'UID de l'utilisateur existant
+                            try {
+                                const user = await auth.signInWithEmailAndPassword('admin@dlt.com', 'admin123');
+                                await db.collection('admins').doc(user.user.uid).set({
+                                    role: 'admin',
+                                    email: 'admin@dlt.com',
+                                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                                });
+                                console.log('✅ Admin ajouté à la collection admins');
+                            } catch (loginError) {
+                                console.error('❌ Erreur connexion admin:', loginError);
+                            }
+                        } else {
+                            console.error('❌ Erreur création admin:', createError);
+                        }
+                    }
+                } else {
+                    console.log('✅ Admin déjà existant');
+                }
             } catch (error) {
-                console.error('❌ Erreur de connexion Firebase:', error);
-                showFlash('⚠️ Erreur de connexion à Firebase: ' + error.message, 4000);
+                console.error('❌ Erreur setup admin:', error);
             }
         }
 
         // ================================================================
-        //  AUTHENTIFICATION
+        //  AUTHENTIFICATION - CORRIGÉE
         // ================================================================
         auth.onAuthStateChanged(async (user) => {
             if (user) {
                 currentUser = user;
                 console.log('👤 Utilisateur connecté:', user.email);
+                console.log('🆔 UID:', user.uid);
+
                 try {
                     const adminDoc = await db.collection('admins').doc(user.uid).get();
+
                     if (adminDoc.exists) {
                         isAdmin = true;
-                        console.log('👑 Utilisateur admin vérifié');
+                        console.log('👑 Utilisateur admin vérifié !');
                         $('adminDashboard').classList.add('show');
-                        renderAdmin();
+                        await renderAdmin();
                         showFlash('👑 Bienvenue dans l\'espace administrateur.', 2000);
                     } else {
                         isAdmin = false;
                         console.log('👤 Utilisateur standard (non-admin)');
+
+                        // Si l'utilisateur est admin@dlt.com mais pas dans admins, l'ajouter
+                        if (user.email === 'admin@dlt.com') {
+                            console.log('🔧 Ajout de l\'admin dans la collection...');
+                            await db.collection('admins').doc(user.uid).set({
+                                role: 'admin',
+                                email: 'admin@dlt.com',
+                                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                            });
+                            isAdmin = true;
+                            $('adminDashboard').classList.add('show');
+                            await renderAdmin();
+                            showFlash('👑 Admin ajouté avec succès !', 2000);
+                        }
                     }
                 } catch (error) {
-                    console.error('Erreur vérification admin:', error);
+                    console.error('❌ Erreur vérification admin:', error);
                     isAdmin = false;
                 }
             } else {
@@ -2178,7 +2223,9 @@
             $('loginOverlay').classList.remove('show');
         });
 
-        // Login
+        // ================================================================
+        //  LOGIN
+        // ================================================================
         $('loginBtn').addEventListener('click', async () => {
             const email = $('loginEmail').value.trim();
             const password = $('loginPassword').value.trim();
@@ -2197,7 +2244,9 @@
             }
         });
 
-        // Logout
+        // ================================================================
+        //  LOGOUT
+        // ================================================================
         $('logoutBtn').addEventListener('click', async () => {
             try {
                 await auth.signOut();
@@ -2211,7 +2260,9 @@
             }
         });
 
-        // Ouverture login
+        // ================================================================
+        //  OUVERTURE LOGIN
+        // ================================================================
         $('adminLoginBtn').addEventListener('click', () => {
             $('loginOverlay').classList.add('show');
         });
@@ -2220,7 +2271,6 @@
             $('loginOverlay').classList.add('show');
         });
 
-        // Fermeture login
         $('loginOverlay').addEventListener('click', (e) => {
             if (e.target === e.currentTarget) {
                 $('loginOverlay').classList.remove('show');
@@ -2272,21 +2322,21 @@
         ];
 
         const carouselTexts = [
-            { atelier: 'Atelier Paris', title: 'Collection', span: 'Exclusive', subtitle: 'La Boutique', desc: 'Découvrez notre sélection <strong>Haute Gamme</strong> de vêtements pour hommes. Chaque pièce est soigneusement choisie pour incarner le <strong>luxe</strong>, le <strong>savoir-faire</strong> et l\'<strong>élégance intemporelle</strong>.' },
-            { atelier: 'Atelier Paris', title: 'L\'Art du', span: 'Vêtement', subtitle: 'Sur Mesure', desc: 'Des tissus d\'exception sélectionnés dans les plus grandes maisons italiennes et anglaises. Chaque pièce est une œuvre d\'art portée.' },
-            { atelier: 'Atelier Paris', title: 'Style', span: 'Authentique', subtitle: 'L\'Excellence', desc: 'Des pièces uniques qui racontent une histoire. Chaque vêtement est conçu pour l\'homme qui ose se démarquer avec <strong>élégance</strong>.' },
-            { atelier: 'Atelier Paris', title: 'Luxe', span: 'Moderne', subtitle: 'L\'Élégance', desc: 'Alliez le raffinement traditionnel à une coupe contemporaine. Découvrez des vêtements qui subliment <strong>votre silhouette</strong>.' },
-            { atelier: 'Atelier Paris', title: 'Élégance', span: 'Intemporelle', subtitle: 'Depuis 2026', desc: 'DLT Boutique incarne le raffinement à la française. Une signature unique pour l\'homme moderne qui recherche l\'excellence.' },
-            { atelier: 'Atelier Paris', title: 'L\'Art du', span: 'Détail', subtitle: 'La Perfection', desc: 'Chaque couture, chaque bouton, chaque tissu est choisi avec une <strong>précision</strong> digne des plus grandes maisons.' },
-            { atelier: 'Atelier Paris', title: 'Style', span: 'Parisien', subtitle: 'L\'Élégance', desc: 'Inspiré des plus grandes silhouettes parisiennes, notre collection allie <strong>modernité</strong> et <strong>tradition</strong>.' },
-            { atelier: 'Atelier Paris', title: 'Luxe', span: 'Responsable', subtitle: 'L\'Éthique', desc: 'Des matières nobles et durables, sélectionnées avec soin pour une <strong>élégance</strong> qui respecte la planète.' },
-            { atelier: 'Atelier Paris', title: 'L\'Art', span: 'du Sur-Mesure', subtitle: 'L\'Excellence', desc: 'Des vêtements conçus pour vous, avec une <strong>attention</strong> particulière à chaque détail pour une silhouette parfaite.' },
-            { atelier: 'Atelier Paris', title: 'Élégance', span: 'Moderne', subtitle: 'Le Style', desc: 'Une vision contemporaine du luxe, où chaque pièce est conçue pour <strong>sublimer</strong> l\'homme d\'aujourd\'hui.' },
-            { atelier: 'Atelier Paris', title: 'Collection', span: 'Privée', subtitle: 'L\'Exclusivité', desc: 'Une sélection limitée de pièces <strong>uniques</strong>, conçues pour ceux qui recherchent l\'exception.' },
-            { atelier: 'Atelier Paris', title: 'L\'Art de', span: 'Vivre', subtitle: 'L\'Élégance', desc: 'Plus qu\'un vêtement, une <strong>philosophie</strong>. L\'élégance est un art de vivre que nous cultivons.' },
-            { atelier: 'Atelier Paris', title: 'Style', span: 'Distingué', subtitle: 'La Classe', desc: 'Des pièces qui parlent d\'<strong>élégance</strong> sans jamais en faire trop. Le luxe dans la sobriété.' },
-            { atelier: 'Atelier Paris', title: 'Luxe', span: 'Authentique', subtitle: 'L\'Excellence', desc: 'Le véritable luxe est dans l\'<strong>authenticité</strong> des matières et la qualité des finitions.' },
-            { atelier: 'Atelier Paris', title: 'Élégance', span: 'Éternelle', subtitle: 'La Signature', desc: 'DLT Boutique, une <strong>signature</strong> unique pour l\'homme qui cherche l\'excellence et l\'éternel.' }
+            { atelier: 'Atelier Paris', title: 'Collection', span: 'Exclusive', subtitle: 'La Boutique', desc: 'Découvrez notre sélection <strong>Haute Gamme</strong> de vêtements pour hommes.' },
+            { atelier: 'Atelier Paris', title: 'L\'Art du', span: 'Vêtement', subtitle: 'Sur Mesure', desc: 'Des tissus d\'exception sélectionnés dans les plus grandes maisons italiennes et anglaises.' },
+            { atelier: 'Atelier Paris', title: 'Style', span: 'Authentique', subtitle: 'L\'Excellence', desc: 'Des pièces uniques qui racontent une histoire.' },
+            { atelier: 'Atelier Paris', title: 'Luxe', span: 'Moderne', subtitle: 'L\'Élégance', desc: 'Alliez le raffinement traditionnel à une coupe contemporaine.' },
+            { atelier: 'Atelier Paris', title: 'Élégance', span: 'Intemporelle', subtitle: 'Depuis 2026', desc: 'DLT Boutique incarne le raffinement à la française.' },
+            { atelier: 'Atelier Paris', title: 'L\'Art du', span: 'Détail', subtitle: 'La Perfection', desc: 'Chaque couture, chaque bouton, chaque tissu est choisi avec précision.' },
+            { atelier: 'Atelier Paris', title: 'Style', span: 'Parisien', subtitle: 'L\'Élégance', desc: 'Inspiré des plus grandes silhouettes parisiennes.' },
+            { atelier: 'Atelier Paris', title: 'Luxe', span: 'Responsable', subtitle: 'L\'Éthique', desc: 'Des matières nobles et durables pour une élégance responsable.' },
+            { atelier: 'Atelier Paris', title: 'L\'Art', span: 'du Sur-Mesure', subtitle: 'L\'Excellence', desc: 'Des vêtements conçus pour vous avec une attention particulière.' },
+            { atelier: 'Atelier Paris', title: 'Élégance', span: 'Moderne', subtitle: 'Le Style', desc: 'Une vision contemporaine du luxe.' },
+            { atelier: 'Atelier Paris', title: 'Collection', span: 'Privée', subtitle: 'L\'Exclusivité', desc: 'Une sélection limitée de pièces uniques.' },
+            { atelier: 'Atelier Paris', title: 'L\'Art de', span: 'Vivre', subtitle: 'L\'Élégance', desc: 'Plus qu\'un vêtement, une philosophie.' },
+            { atelier: 'Atelier Paris', title: 'Style', span: 'Distingué', subtitle: 'La Classe', desc: 'Des pièces qui parlent d\'élégance sans jamais en faire trop.' },
+            { atelier: 'Atelier Paris', title: 'Luxe', span: 'Authentique', subtitle: 'L\'Excellence', desc: 'Le véritable luxe est dans l\'authenticité des matières.' },
+            { atelier: 'Atelier Paris', title: 'Élégance', span: 'Éternelle', subtitle: 'La Signature', desc: 'DLT Boutique, une signature unique pour l\'homme qui cherche l\'excellence.' }
         ];
 
         const carouselContainer = $('heroCarousel');
@@ -2319,10 +2369,7 @@
                                 <div class="hero-logo-display">
                                     <div class="ring-ornament"></div>
                                     <div class="ring-ornament"></div>
-                                    <div class="big-logo">
-                                        DLT
-                                        <span>BOUTIQUE</span>
-                                    </div>
+                                    <div class="big-logo">DLT<span>BOUTIQUE</span></div>
                                     <div class="established">KASHIPUSE · 2026</div>
                                 </div>
                             </div>
@@ -2419,58 +2466,29 @@
         }
 
         // ================================================================
-        //  UPLOAD D'IMAGE VERS FIREBASE STORAGE
+        //  UPLOAD D'IMAGE
         // ================================================================
-        async function uploadImageToStorage(file, productName) {
+        async function uploadImageToStorage(file) {
             if (!file) return null;
-            
             try {
                 console.log('📤 Upload de l\'image vers Firebase Storage...');
-                
-                // Créer un nom de fichier unique
                 const timestamp = Date.now();
                 const fileName = `${timestamp}_${file.name}`;
                 const storageRef = storage.ref(`products/${fileName}`);
-                
-                // Upload du fichier
                 const uploadTask = storageRef.put(file);
-                
-                // Attendre la fin de l'upload
                 const snapshot = await uploadTask;
-                console.log('✅ Image uploadée avec succès');
-                
-                // Récupérer l'URL de téléchargement
                 const downloadURL = await snapshot.ref.getDownloadURL();
-                console.log('📸 URL de l\'image:', downloadURL);
-                
+                console.log('✅ Image uploadée avec succès');
                 return downloadURL;
             } catch (error) {
-                console.error('❌ Erreur lors de l\'upload de l\'image:', error);
-                showFlash('❌ Erreur lors de l\'upload de l\'image: ' + error.message, 3000);
+                console.error('❌ Erreur upload image:', error);
+                showFlash('❌ Erreur upload image: ' + error.message, 3000);
                 return null;
             }
         }
 
         // ================================================================
-        //  SUPPRESSION D'IMAGE DE FIREBASE STORAGE
-        // ================================================================
-        async function deleteImageFromStorage(imageUrl) {
-            if (!imageUrl) return;
-            
-            try {
-                console.log('🗑️ Suppression de l\'image de Storage...');
-                // Extraire le chemin depuis l'URL
-                const path = decodeURIComponent(imageUrl.split('/o/')[1].split('?')[0]);
-                const fileRef = storage.ref(path);
-                await fileRef.delete();
-                console.log('✅ Image supprimée de Storage');
-            } catch (error) {
-                console.error('❌ Erreur suppression image:', error);
-            }
-        }
-
-        // ================================================================
-        //  FORMULAIRE ADMIN - UPLOAD D'IMAGE
+        //  FORMULAIRE ADMIN - UPLOAD
         // ================================================================
         $('adminProductImage').addEventListener('change', function(e) {
             const file = e.target.files[0];
@@ -2520,14 +2538,8 @@
 
             try {
                 let imageUrl = $('adminProductImage').dataset.existingUrl || '';
-
-                // Upload nouvelle image vers Firebase Storage
                 if (selectedFile) {
-                    // Si une ancienne image existe, la supprimer
-                    if (imageUrl) {
-                        await deleteImageFromStorage(imageUrl);
-                    }
-                    imageUrl = await uploadImageToStorage(selectedFile, name);
+                    imageUrl = await uploadImageToStorage(selectedFile);
                 }
 
                 const productData = {
@@ -2543,21 +2555,16 @@
                 };
 
                 if (id) {
-                    // Mise à jour
                     await db.collection('products').doc(id).update(productData);
                     addNotification(`✏️ Produit modifié : ${name}`);
                     showFlash('✅ Produit modifié avec succès !', 2000);
-                    console.log(`✏️ Produit "${name}" modifié`);
                 } else {
-                    // Ajout
                     productData.createdAt = firebase.firestore.FieldValue.serverTimestamp();
                     await db.collection('products').add(productData);
                     addNotification(`➕ Nouveau produit ajouté : ${name}`);
                     showFlash('✅ Produit ajouté avec succès !', 2000);
-                    console.log(`➕ Nouveau produit "${name}" ajouté`);
                 }
 
-                // Réinitialiser le formulaire
                 $('adminForm').reset();
                 $('editProductId').value = '';
                 $('imagePreview').style.display = 'none';
@@ -2568,7 +2575,7 @@
                 await loadProducts();
             } catch (error) {
                 console.error('❌ Erreur sauvegarde:', error);
-                showFlash('❌ Erreur lors de l\'enregistrement: ' + error.message, 3000);
+                showFlash('❌ Erreur: ' + error.message, 3000);
             }
 
             submitBtn.disabled = false;
@@ -2601,7 +2608,6 @@
             }
 
             $('adminForm').scrollIntoView({ behavior: 'smooth', block: 'center' });
-            console.log(`✏️ Édition du produit "${product.name}"`);
         }
 
         // ================================================================
@@ -2616,15 +2622,9 @@
 
             try {
                 const product = products.find(p => p.id === id);
-                if (product && product.image) {
-                    // Supprimer l'image de Storage
-                    await deleteImageFromStorage(product.image);
-                }
-                
                 await db.collection('products').doc(id).delete();
                 addNotification(`🗑️ Produit supprimé : ${product?.name || 'ID ' + id}`);
                 showFlash('🗑️ Produit supprimé.', 1500);
-                console.log(`🗑️ Produit "${product?.name}" supprimé`);
                 await loadProducts();
             } catch (error) {
                 console.error('❌ Erreur suppression:', error);
@@ -2720,8 +2720,7 @@
                     renderCategories();
                     renderBrands();
                     renderProducts();
-                    document.getElementById('currentCategoryLabel').textContent =
-                        labels[currentCategory] || 'Tous';
+                    document.getElementById('currentCategoryLabel').textContent = labels[currentCategory] || 'Tous';
                     document.querySelectorAll('.nav-desktop a, .mobile-menu-content a').forEach(a => a.classList.remove('active'));
                     document.querySelector(`.nav-desktop a[data-cat="${currentCategory}"]`)?.classList.add('active');
                     document.querySelector(`.mobile-menu-content a[data-cat="${currentCategory}"]`)?.classList.add('active');
@@ -2880,8 +2879,7 @@
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 };
 
-                const orderRef = await db.collection('orders').add(orderData);
-                console.log(`📦 Commande créée: ${orderRef.id}`);
+                await db.collection('orders').add(orderData);
 
                 for (const item of cart) {
                     const product = products.find(p => p.id === item.id);
@@ -3003,7 +3001,6 @@
                     createdAt: firebase.firestore.FieldValue.serverTimestamp(),
                     read: false
                 });
-                console.log('📢 Notification ajoutée:', message);
             } catch (error) {
                 console.error('❌ Erreur ajout notification:', error);
             }
@@ -3094,25 +3091,22 @@
         // ================================================================
         async function init() {
             console.log('🚀 Initialisation de l\'application...');
-            console.log('📋 Firestore:', db);
-            console.log('📦 Storage:', storage);
-            console.log('🔐 Auth:', auth);
-            
-            // Test de connexion
-            await testFirebaseConnection();
-            
+
+            // Setup admin automatique
+            await setupAdmin();
+
             // Chargement des produits
             await loadProducts();
             updateCartUI();
-            
+
             console.log('✅ Application initialisée avec succès !');
             console.log('👔 DLT BOUTIQUE - Atelier Paris');
             console.log('👑 Admin: admin@dlt.com / admin123');
             console.log('📸 Upload d\'images vers Firebase Storage activé');
             console.log('💳 Paiements: Airtel Money, M-Pesa, Orange Money, Visa, Mastercard, PayPal');
+            console.log('📊 Analytics activé');
         }
 
-        // Lancer l'application
         init();
     </script>
 
