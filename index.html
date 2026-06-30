@@ -1119,6 +1119,12 @@
             margin-top: 10px;
             display: none;
         }
+        .login-box .success-msg {
+            color: #27ae60;
+            font-size: 14px;
+            margin-top: 10px;
+            display: none;
+        }
 
         /* ===== ADMIN DASHBOARD ===== */
         .admin-dashboard {
@@ -1742,6 +1748,7 @@
             <input type="password" id="loginPassword" placeholder="Mot de passe" value="admin123">
             <button class="login-btn" id="loginBtn"><i class="fas fa-sign-in-alt"></i> Se connecter</button>
             <div class="error-msg" id="loginError">Identifiants incorrects</div>
+            <div class="success-msg" id="loginSuccess">Connexion réussie !</div>
         </div>
     </div>
 
@@ -1832,7 +1839,7 @@
     <div class="flash-message" id="flashMessage"></div>
 
     <!-- ============================================================
-    JAVASCRIPT - INITIALISATION AUTOMATIQUE
+    JAVASCRIPT - CORRIGÉ
     ============================================================ -->
     <script>
         // ================================================================
@@ -1849,7 +1856,7 @@
             measurementId: "G-S6TP863VWR"
         };
 
-        console.log('🔥 Initialisation automatique de Firebase...');
+        console.log('🔥 Initialisation de Firebase...');
         firebase.initializeApp(firebaseConfig);
         console.log('✅ Firebase App initialisée');
 
@@ -1879,8 +1886,6 @@
         let shopVisible = false;
         let currentUser = null;
         let selectedFile = null;
-        let isLoggingIn = false;
-        let initialSetupDone = false;
 
         // ================================================================
         //  RÉFÉRENCES DOM
@@ -1889,127 +1894,170 @@
         const flashMsg = $('flashMessage');
 
         // ================================================================
-        //  INITIALISATION AUTOMATIQUE DE L'ADMIN - CORRIGÉE
+        //  RÉINITIALISATION AUTOMATIQUE DE FIRESTORE - SIMPLIFIÉE
         // ================================================================
-        async function initializeAdmin() {
+        async function initializeFirestore() {
+            console.log('🔄 Initialisation de Firestore...');
+            
             try {
-                console.log('🔧 INITIALISATION AUTOMATIQUE DE L\'ADMIN...');
-                
-                // 1. Vérifier si un admin existe déjà dans Firestore
+                // 1. Vérifier et créer l'admin
+                console.log('📌 Vérification de l\'administrateur...');
                 const adminSnapshot = await db.collection('admins').where('email', '==', 'admin@dlt.com').get();
                 
-                if (!adminSnapshot.empty) {
-                    console.log('✅ Admin déjà existant dans Firestore');
-                    return true;
-                }
-                
-                console.log('👑 Aucun admin trouvé, création automatique...');
-                
-                // 2. Essayer de créer l'utilisateur admin
-                try {
-                    const userCredential = await auth.createUserWithEmailAndPassword('admin@dlt.com', 'admin123');
-                    const uid = userCredential.user.uid;
+                if (adminSnapshot.empty) {
+                    console.log('👑 Création de l\'admin...');
                     
-                    // 3. Ajouter l'admin dans Firestore
-                    await db.collection('admins').doc(uid).set({
-                        role: 'admin',
-                        email: 'admin@dlt.com',
-                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                    });
-                    
-                    console.log('✅ Admin créé avec succès !');
-                    console.log('👑 Email: admin@dlt.com');
-                    console.log('🔑 Mot de passe: admin123');
-                    
-                    // 4. Déconnecter pour que l'utilisateur puisse se connecter manuellement
-                    await auth.signOut();
-                    showFlash('👑 Admin créé avec succès ! Connectez-vous avec admin@dlt.com / admin123', 4000);
-                    return true;
-                    
-                } catch (createError) {
-                    if (createError.code === 'auth/email-already-in-use') {
-                        console.log('ℹ️ L\'utilisateur admin existe déjà dans Auth');
-                        
-                        try {
-                            // Essayer de se connecter pour obtenir l'UID
-                            const userCredential = await auth.signInWithEmailAndPassword('admin@dlt.com', 'admin123');
-                            const uid = userCredential.user.uid;
-                            
-                            // Vérifier si l'admin existe dans Firestore
+                    // Vérifier si l'utilisateur existe déjà dans Auth
+                    try {
+                        const userCredential = await auth.createUserWithEmailAndPassword('admin@dlt.com', 'admin123');
+                        const uid = userCredential.user.uid;
+                        await db.collection('admins').doc(uid).set({
+                            email: 'admin@dlt.com',
+                            role: 'admin',
+                            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                        });
+                        console.log('✅ Admin créé avec succès !');
+                        await auth.signOut();
+                    } catch (e) {
+                        if (e.code === 'auth/email-already-in-use') {
+                            console.log('ℹ️ Admin existe déjà dans Auth');
+                            const userCred = await auth.signInWithEmailAndPassword('admin@dlt.com', 'admin123');
+                            const uid = userCred.user.uid;
                             const docRef = db.collection('admins').doc(uid);
                             const doc = await docRef.get();
-                            
                             if (!doc.exists) {
                                 await docRef.set({
-                                    role: 'admin',
                                     email: 'admin@dlt.com',
+                                    role: 'admin',
                                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
                                 });
                                 console.log('✅ Admin ajouté à Firestore');
                             }
-                            
-                            // Déconnecter
                             await auth.signOut();
-                            showFlash('👑 Admin récupéré avec succès ! Connectez-vous avec admin@dlt.com / admin123', 4000);
-                            return true;
-                            
-                        } catch (loginError) {
-                            console.error('❌ Erreur connexion admin:', loginError);
-                            return false;
                         }
-                    } else {
-                        console.error('❌ Erreur création admin:', createError);
-                        return false;
                     }
+                } else {
+                    console.log('✅ Admin déjà existant');
                 }
+
+                // 2. Vérifier et créer les produits de démonstration
+                console.log('📌 Vérification des produits...');
+                const productsSnapshot = await db.collection('products').limit(1).get();
+                
+                if (productsSnapshot.empty) {
+                    console.log('📦 Création des produits de démonstration...');
+                    const demoProducts = [
+                        { name: 'Veste en Laine Cachemire', category: 'veste', brand: 'Armani', price: 299.99, stock: 15, image: '', badge: 'Exclusif', description: 'Veste en laine cachemire italienne.' },
+                        { name: 'Chemise Oxford Blanc', category: 'chemise', brand: 'Hugo Boss', price: 89.99, stock: 25, image: '', badge: 'Nouveau', description: 'Chemise Oxford en coton égyptien.' },
+                        { name: 'Pantalon Tailleur Gris', category: 'pantalon', brand: 'Zegna', price: 199.99, stock: 12, image: '', badge: 'Premium', description: 'Pantalon de costume en laine peignée.' },
+                        { name: 'Polo Coton Piqué', category: 'polo', brand: 'Lacoste', price: 69.99, stock: 30, image: '', badge: '', description: 'Polo en coton piqué.' },
+                        { name: 'Culotte Chino Bleue', category: 'culotte', brand: 'Dockers', price: 79.99, stock: 20, image: '', badge: '', description: 'Culotte chino en coton stretch.' },
+                        { name: 'Mocassin Cuir Noir', category: 'chaussure', brand: 'Ferragamo', price: 249.99, stock: 8, image: '', badge: 'Exclusif', description: 'Mocassin en cuir de veau noir.' },
+                        { name: 'Costume Mariage Bleu', category: 'mariage', brand: 'Tom Ford', price: 599.99, stock: 5, image: '', badge: 'Premium', description: 'Costume de mariage en laine super 120.' },
+                        { name: 'Cravate Soie Bordeaux', category: 'accessoire', brand: 'Hermès', price: 149.99, stock: 18, image: '', badge: 'Nouveau', description: 'Cravate en soie 100%.' }
+                    ];
+                    for (const product of demoProducts) {
+                        await db.collection('products').add({
+                            ...product,
+                            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                        });
+                    }
+                    console.log('✅ 8 produits créés');
+                }
+
+                // 3. Vérifier et créer une commande de démonstration
+                console.log('📌 Vérification des commandes...');
+                const ordersSnapshot = await db.collection('orders').limit(1).get();
+                if (ordersSnapshot.empty) {
+                    console.log('📦 Création d\'une commande de démonstration...');
+                    await db.collection('orders').add({
+                        items: [{ name: 'Veste en Laine Cachemire', brand: 'Armani', price: 299.99, qty: 1 }],
+                        total: 299.99,
+                        paymentMethod: 'airtel',
+                        status: 'payée',
+                        date: new Date().toISOString(),
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    console.log('✅ Commande créée');
+                }
+
+                // 4. Vérifier et créer les notifications
+                console.log('📌 Vérification des notifications...');
+                const notifSnapshot = await db.collection('notifications').limit(1).get();
+                if (notifSnapshot.empty) {
+                    console.log('📦 Création des notifications...');
+                    await db.collection('notifications').add({
+                        message: '👑 Bienvenue sur DLT BOUTIQUE !',
+                        time: new Date().toLocaleString(),
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        read: false
+                    });
+                    await db.collection('notifications').add({
+                        message: '📦 8 produits de démonstration disponibles',
+                        time: new Date().toLocaleString(),
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        read: false
+                    });
+                    console.log('✅ Notifications créées');
+                }
+
+                console.log('✅ Firestore initialisé avec succès !');
+                return true;
+
             } catch (error) {
-                console.error('❌ Erreur initialisation admin:', error);
+                console.error('❌ Erreur initialisation Firestore:', error);
                 return false;
             }
         }
 
         // ================================================================
-        //  AUTHENTIFICATION - AMÉLIORÉE
+        //  AUTHENTIFICATION - CORRIGÉE
         // ================================================================
         auth.onAuthStateChanged(async (user) => {
-            console.log('🔄 onAuthStateChanged déclenché');
+            console.log('🔄 onAuthStateChanged:', user ? user.email : 'Aucun utilisateur');
+            
+            // Réinitialiser le bouton de connexion
+            const loginBtn = $('loginBtn');
+            loginBtn.disabled = false;
+            loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Se connecter';
             
             if (user) {
                 currentUser = user;
                 console.log('👤 Utilisateur connecté:', user.email);
-                console.log('🆔 UID:', user.uid);
                 
                 try {
-                    // Vérifier si l'utilisateur est admin dans Firestore
                     const adminDoc = await db.collection('admins').doc(user.uid).get();
                     
                     if (adminDoc.exists && adminDoc.data().role === 'admin') {
                         isAdmin = true;
-                        console.log('👑 Utilisateur admin vérifié !');
-                        // Afficher le dashboard
-                        const dashboard = $('adminDashboard');
-                        dashboard.classList.add('show');
+                        console.log('👑 Admin vérifié !');
+                        $('adminDashboard').classList.add('show');
+                        await loadProducts();
                         await renderAdmin();
+                        $('loginOverlay').classList.remove('show');
                         showFlash('👑 Bienvenue dans l\'espace administrateur.', 2000);
                     } else {
-                        // Si l'utilisateur est admin@dlt.com mais pas dans admins
+                        // Si c'est admin@dlt.com mais pas dans admins
                         if (user.email === 'admin@dlt.com') {
-                            console.log('🔧 Ajout de l\'admin dans la collection...');
+                            console.log('🔧 Ajout de l\'admin...');
                             await db.collection('admins').doc(user.uid).set({
-                                role: 'admin',
                                 email: 'admin@dlt.com',
+                                role: 'admin',
                                 createdAt: firebase.firestore.FieldValue.serverTimestamp()
                             });
                             isAdmin = true;
-                            const dashboard = $('adminDashboard');
-                            dashboard.classList.add('show');
+                            $('adminDashboard').classList.add('show');
+                            await loadProducts();
                             await renderAdmin();
+                            $('loginOverlay').classList.remove('show');
                             showFlash('👑 Admin ajouté avec succès !', 2000);
                         } else {
                             isAdmin = false;
-                            console.log('👤 Utilisateur standard (non-admin)');
+                            console.log('👤 Utilisateur standard');
                             $('adminDashboard').classList.remove('show');
-                            showFlash('👤 Vous êtes connecté en tant qu\'utilisateur standard.', 2000);
+                            $('loginOverlay').classList.remove('show');
+                            showFlash('👤 Connecté en tant qu\'utilisateur standard.', 2000);
                         }
                     }
                 } catch (error) {
@@ -2023,62 +2071,32 @@
                 $('adminDashboard').classList.remove('show');
                 console.log('👤 Aucun utilisateur connecté');
             }
-            
-            $('loginOverlay').classList.remove('show');
-            isLoggingIn = false;
         });
 
         // ================================================================
-        //  LOGIN - AVEC FORCE D'AFFICHAGE
+        //  LOGIN - CORRIGÉ
         // ================================================================
         $('loginBtn').addEventListener('click', async () => {
-            if (isLoggingIn) return;
-            
             const email = $('loginEmail').value.trim();
             const password = $('loginPassword').value.trim();
             const errorEl = $('loginError');
+            const successEl = $('loginSuccess');
             const loginBtn = $('loginBtn');
             
-            isLoggingIn = true;
+            errorEl.style.display = 'none';
+            successEl.style.display = 'none';
+            
             loginBtn.disabled = true;
             loginBtn.innerHTML = '<span class="loading-spinner"></span> Connexion...';
-            errorEl.style.display = 'none';
             
             try {
                 console.log('🔐 Tentative de connexion pour:', email);
-                const userCredential = await auth.signInWithEmailAndPassword(email, password);
-                console.log('✅ Connexion réussie pour:', userCredential.user.email);
+                await auth.signInWithEmailAndPassword(email, password);
+                console.log('✅ Connexion réussie');
                 
-                // Vérification supplémentaire après connexion
-                setTimeout(async () => {
-                    const user = auth.currentUser;
-                    if (user) {
-                        try {
-                            const adminDoc = await db.collection('admins').doc(user.uid).get();
-                            if (adminDoc.exists && adminDoc.data().role === 'admin') {
-                                isAdmin = true;
-                                $('adminDashboard').classList.add('show');
-                                await renderAdmin();
-                                showFlash('👑 Connexion admin réussie !', 2000);
-                            } else if (user.email === 'admin@dlt.com') {
-                                // Ajouter l'admin si nécessaire
-                                await db.collection('admins').doc(user.uid).set({
-                                    role: 'admin',
-                                    email: 'admin@dlt.com',
-                                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                                });
-                                isAdmin = true;
-                                $('adminDashboard').classList.add('show');
-                                await renderAdmin();
-                                showFlash('👑 Admin ajouté et connecté !', 2000);
-                            }
-                        } catch (e) {
-                            console.error('Erreur vérification post-connexion:', e);
-                        }
-                    }
-                }, 500);
-                
-                errorEl.style.display = 'none';
+                // La suite est gérée par onAuthStateChanged
+                successEl.textContent = '✅ Connexion réussie !';
+                successEl.style.display = 'block';
                 
             } catch (error) {
                 console.error('❌ Erreur de connexion:', error);
@@ -2096,9 +2114,7 @@
                 
                 errorEl.textContent = errorMessage;
                 errorEl.style.display = 'block';
-                setTimeout(() => errorEl.style.display = 'none', 5000);
                 
-                isLoggingIn = false;
                 loginBtn.disabled = false;
                 loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Se connecter';
             }
@@ -2113,7 +2129,6 @@
                 isAdmin = false;
                 $('adminDashboard').classList.remove('show');
                 showFlash('👋 Déconnexion réussie.', 1500);
-                console.log('👋 Déconnexion réussie');
             } catch (error) {
                 console.error('❌ Erreur déconnexion:', error);
                 showFlash('❌ Erreur lors de la déconnexion.', 2000);
@@ -2125,11 +2140,15 @@
         // ================================================================
         $('adminLoginBtn').addEventListener('click', () => {
             $('loginOverlay').classList.add('show');
+            $('loginError').style.display = 'none';
+            $('loginSuccess').style.display = 'none';
         });
         
         $('mobileAdminBtn').addEventListener('click', () => {
             closeMenu();
             $('loginOverlay').classList.add('show');
+            $('loginError').style.display = 'none';
+            $('loginSuccess').style.display = 'none';
         });
 
         $('loginOverlay').addEventListener('click', (e) => {
@@ -2167,12 +2186,9 @@
         }
         hamburgerBtn.addEventListener('click', toggleMenu);
         menuBackdrop.addEventListener('click', closeMenu);
-        document.querySelectorAll('.mobile-menu-content a').forEach(link => {
-            link.addEventListener('click', () => { if (!link.classList.contains('mobile-admin-link')) closeMenu(); });
-        });
 
         // ================================================================
-        //  CARROUSEL
+        //  CARROUSEL (version simplifiée)
         // ================================================================
         const carouselImages = [
             'carrousel (1).jpg', 'carrousel (2).jpeg', 'carrousel (3).jpeg',
@@ -2182,41 +2198,17 @@
             'carrousel (13).jpeg', 'carrousel (14).jpeg', 'carrousel (1).jpg'
         ];
         const carouselTexts = [
-            { atelier: 'Atelier Paris', title: 'Collection', span: 'Exclusive', subtitle: 'La Boutique',
-            desc: 'Découvrez notre sélection <strong>Haute Gamme</strong> de vêtements pour hommes.' },
-            { atelier: 'Atelier Paris', title: 'L\'Art du', span: 'Vêtement', subtitle: 'Sur Mesure',
-            desc: 'Des tissus d\'exception sélectionnés dans les plus grandes maisons italiennes et anglaises.' },
-            { atelier: 'Atelier Paris', title: 'Style', span: 'Authentique', subtitle: 'L\'Excellence',
-            desc: 'Des pièces uniques qui racontent une histoire.' },
-            { atelier: 'Atelier Paris', title: 'Luxe', span: 'Moderne', subtitle: 'L\'Élégance',
-            desc: 'Alliez le raffinement traditionnel à une coupe contemporaine.' },
-            { atelier: 'Atelier Paris', title: 'Élégance', span: 'Intemporelle', subtitle: 'Depuis 2026',
-            desc: 'DLT Boutique incarne le raffinement à la française.' },
-            { atelier: 'Atelier Paris', title: 'L\'Art du', span: 'Détail', subtitle: 'La Perfection',
-            desc: 'Chaque couture, chaque bouton, chaque tissu est choisi avec précision.' },
-            { atelier: 'Atelier Paris', title: 'Style', span: 'Parisien', subtitle: 'L\'Élégance',
-            desc: 'Inspiré des plus grandes silhouettes parisiennes.' },
-            { atelier: 'Atelier Paris', title: 'Luxe', span: 'Responsable', subtitle: 'L\'Éthique',
-            desc: 'Des matières nobles et durables pour une élégance responsable.' },
-            { atelier: 'Atelier Paris', title: 'L\'Art', span: 'du Sur-Mesure', subtitle: 'L\'Excellence',
-            desc: 'Des vêtements conçus pour vous avec une attention particulière.' },
-            { atelier: 'Atelier Paris', title: 'Élégance', span: 'Moderne', subtitle: 'Le Style',
-            desc: 'Une vision contemporaine du luxe.' },
-            { atelier: 'Atelier Paris', title: 'Collection', span: 'Privée', subtitle: 'L\'Exclusivité',
-            desc: 'Une sélection limitée de pièces uniques.' },
-            { atelier: 'Atelier Paris', title: 'L\'Art de', span: 'Vivre', subtitle: 'L\'Élégance',
-            desc: 'Plus qu\'un vêtement, une philosophie.' },
-            { atelier: 'Atelier Paris', title: 'Style', span: 'Distingué', subtitle: 'La Classe',
-            desc: 'Des pièces qui parlent d\'élégance sans jamais en faire trop.' },
-            { atelier: 'Atelier Paris', title: 'Luxe', span: 'Authentique', subtitle: 'L\'Excellence',
-            desc: 'Le véritable luxe est dans l\'authenticité des matières.' },
-            { atelier: 'Atelier Paris', title: 'Élégance', span: 'Éternelle', subtitle: 'La Signature',
-            desc: 'DLT Boutique, une signature unique pour l\'homme qui cherche l\'excellence.' }
+            { atelier: 'Atelier Paris', title: 'Collection', span: 'Exclusive', subtitle: 'La Boutique', desc: 'Découvrez notre sélection <strong>Haute Gamme</strong> de vêtements pour hommes.' },
+            { atelier: 'Atelier Paris', title: 'L\'Art du', span: 'Vêtement', subtitle: 'Sur Mesure', desc: 'Des tissus d\'exception sélectionnés dans les plus grandes maisons.' },
+            { atelier: 'Atelier Paris', title: 'Style', span: 'Authentique', subtitle: 'L\'Excellence', desc: 'Des pièces uniques qui racontent une histoire.' },
+            { atelier: 'Atelier Paris', title: 'Luxe', span: 'Moderne', subtitle: 'L\'Élégance', desc: 'Alliez le raffinement traditionnel à une coupe contemporaine.' },
+            { atelier: 'Atelier Paris', title: 'Élégance', span: 'Intemporelle', subtitle: 'Depuis 2026', desc: 'DLT Boutique incarne le raffinement à la française.' }
         ];
 
         const carouselContainer = $('heroCarousel');
         const indicatorsContainer = $('carouselIndicators');
-        carouselImages.forEach((img, index) => {
+        
+        carouselImages.slice(0, 5).forEach((img, index) => {
             const slide = document.createElement('div');
             slide.className = `slide ${index === 0 ? 'active' : ''}`;
             slide.style.backgroundImage = `url('${img}')`;
@@ -2266,19 +2258,15 @@
         }
 
         function nextSlide() { goToSlide((currentSlide + 1) % slides.length); }
-
         function prevSlide() { goToSlide((currentSlide - 1 + slides.length) % slides.length); }
-
         function startCarousel() { slideInterval = setInterval(nextSlide, 5000); }
+        function resetCarousel() { clearInterval(slideInterval); startCarousel(); }
 
-        function resetCarousel() { clearInterval(slideInterval);
-            startCarousel(); }
-        dots.forEach((dot, index) => { dot.addEventListener('click', () => { goToSlide(index);
-                resetCarousel(); }); });
-        $('nextSlide').addEventListener('click', () => { nextSlide();
-            resetCarousel(); });
-        $('prevSlide').addEventListener('click', () => { prevSlide();
-            resetCarousel(); });
+        dots.forEach((dot, index) => {
+            dot.addEventListener('click', () => { goToSlide(index); resetCarousel(); });
+        });
+        $('nextSlide').addEventListener('click', () => { nextSlide(); resetCarousel(); });
+        $('prevSlide').addEventListener('click', () => { prevSlide(); resetCarousel(); });
         startCarousel();
 
         document.querySelectorAll('.btn-primary[data-slide], .btn-secondary[data-slide]').forEach(btn => {
@@ -2293,7 +2281,7 @@
         // ================================================================
         async function loadProducts() {
             try {
-                console.log('📦 Chargement des produits depuis Firestore...');
+                console.log('📦 Chargement des produits...');
                 const snapshot = await db.collection('products').orderBy('createdAt', 'desc').get();
                 products = [];
                 snapshot.forEach(doc => { products.push({ id: doc.id, ...doc.data() }); });
@@ -2314,24 +2302,24 @@
         async function uploadImageToStorage(file) {
             if (!file) return null;
             try {
-                console.log('📤 Upload de l\'image vers Firebase Storage...');
+                console.log('📤 Upload de l\'image...');
                 const timestamp = Date.now();
                 const fileName = `${timestamp}_${file.name}`;
                 const storageRef = storage.ref(`products/${fileName}`);
                 const uploadTask = storageRef.put(file);
                 const snapshot = await uploadTask;
                 const downloadURL = await snapshot.ref.getDownloadURL();
-                console.log('✅ Image uploadée avec succès');
+                console.log('✅ Image uploadée');
                 return downloadURL;
             } catch (error) {
                 console.error('❌ Erreur upload image:', error);
-                showFlash('❌ Erreur upload image: ' + error.message, 3000);
+                showFlash('❌ Erreur upload image', 3000);
                 return null;
             }
         }
 
         // ================================================================
-        //  FORMULAIRE ADMIN - UPLOAD
+        //  FORMULAIRE ADMIN
         // ================================================================
         $('adminProductImage').addEventListener('change', function(e) {
             const file = e.target.files[0];
@@ -2349,12 +2337,10 @@
             }
         });
 
-        // ================================================================
-        //  AJOUTER/MODIFIER PRODUIT
-        // ================================================================
         $('adminForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            if (!isAdmin) { showFlash('⚠️ Vous devez être connecté en tant qu\'admin.', 2000); return; }
+            if (!isAdmin) { showFlash('⚠️ Vous devez être administrateur.', 2000); return; }
+            
             const submitBtn = $('adminSubmitBtn');
             submitBtn.disabled = true;
             submitBtn.innerHTML = '<span class="loading-spinner"></span> Enregistrement...';
@@ -2380,26 +2366,14 @@
                 if (selectedFile) {
                     imageUrl = await uploadImageToStorage(selectedFile);
                 }
-                const productData = {
-                    name,
-                    category,
-                    brand,
-                    price,
-                    stock,
-                    image: imageUrl,
-                    badge,
-                    description,
-                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                };
+                const productData = { name, category, brand, price, stock, image: imageUrl, badge, description, updatedAt: firebase.firestore.FieldValue.serverTimestamp() };
                 if (id) {
                     await db.collection('products').doc(id).update(productData);
-                    addNotification(`✏️ Produit modifié : ${name}`);
-                    showFlash('✅ Produit modifié avec succès !', 2000);
+                    showFlash('✅ Produit modifié !', 2000);
                 } else {
                     productData.createdAt = firebase.firestore.FieldValue.serverTimestamp();
                     await db.collection('products').add(productData);
-                    addNotification(`➕ Nouveau produit ajouté : ${name}`);
-                    showFlash('✅ Produit ajouté avec succès !', 2000);
+                    showFlash('✅ Produit ajouté !', 2000);
                 }
                 $('adminForm').reset();
                 $('editProductId').value = '';
@@ -2450,7 +2424,6 @@
             try {
                 const product = products.find(p => p.id === id);
                 await db.collection('products').doc(id).delete();
-                addNotification(`🗑️ Produit supprimé : ${product?.name || 'ID ' + id}`);
                 showFlash('🗑️ Produit supprimé.', 1500);
                 await loadProducts();
             } catch (error) {
@@ -2470,8 +2443,7 @@
                 return catMatch && brandMatch;
             });
             if (filtered.length === 0) {
-                grid.innerHTML =
-                    `<p style="grid-column:1/-1; text-align:center; padding:40px; color:#999;">Aucun produit dans cette sélection.</p>`;
+                grid.innerHTML = `<p style="grid-column:1/-1; text-align:center; padding:40px; color:#999;">Aucun produit.</p>`;
                 return;
             }
             grid.innerHTML = filtered.map(p => `
@@ -2504,20 +2476,11 @@
         function renderCategories() {
             const grid = $('categoriesGrid');
             const cats = ['all', 'veste', 'chemise', 'pantalon', 'polo', 'culotte', 'chaussure', 'mariage', 'accessoire'];
-            const labels = { all: 'Tous', veste: 'Vestes', chemise: 'Chemises', pantalon: 'Pantalons', polo: 'Polos',
-                culotte: 'Culottes', chaussure: 'Chaussures', mariage: 'Mariage', accessoire: 'Accessoires' };
-            const icons = { all: 'fa-th-large', veste: 'fa-jacket', chemise: 'fa-shirt', pantalon: 'fa-trousers',
-                polo: 'fa-tshirt', culotte: 'fa-shorts', chaussure: 'fa-shoe-prints', mariage: 'fa-ring',
-                accessoire: 'fa-gem' };
+            const labels = { all: 'Tous', veste: 'Vestes', chemise: 'Chemises', pantalon: 'Pantalons', polo: 'Polos', culotte: 'Culottes', chaussure: 'Chaussures', mariage: 'Mariage', accessoire: 'Accessoires' };
+            const icons = { all: 'fa-th-large', veste: 'fa-jacket', chemise: 'fa-shirt', pantalon: 'fa-trousers', polo: 'fa-tshirt', culotte: 'fa-shorts', chaussure: 'fa-shoe-prints', mariage: 'fa-ring', accessoire: 'fa-gem' };
             grid.innerHTML = cats.map(cat => {
                 const count = products.filter(p => cat === 'all' || p.category === cat).length;
-                return `
-                        <div class="category-card ${cat === currentCategory ? 'active' : ''}" data-cat="${cat}">
-                            <i class="fas ${icons[cat] || 'fa-tag'}"></i>
-                            <span>${labels[cat]}</span>
-                            <span class="count">${count} articles</span>
-                        </div>
-                    `;
+                return `<div class="category-card ${cat === currentCategory ? 'active' : ''}" data-cat="${cat}"><i class="fas ${icons[cat] || 'fa-tag'}"></i><span>${labels[cat]}</span><span class="count">${count} articles</span></div>`;
             }).join('');
             document.querySelectorAll('.category-card').forEach(el => {
                 el.addEventListener('click', () => {
@@ -2527,12 +2490,9 @@
                     renderBrands();
                     renderProducts();
                     document.getElementById('currentCategoryLabel').textContent = labels[currentCategory] || 'Tous';
-                    document.querySelectorAll('.nav-desktop a, .mobile-menu-content a').forEach(a => a.classList
-                        .remove('active'));
-                    document.querySelector(`.nav-desktop a[data-cat="${currentCategory}"]`)?.classList.add(
-                    'active');
-                    document.querySelector(`.mobile-menu-content a[data-cat="${currentCategory}"]`)?.classList
-                        .add('active');
+                    document.querySelectorAll('.nav-desktop a, .mobile-menu-content a').forEach(a => a.classList.remove('active'));
+                    document.querySelector(`.nav-desktop a[data-cat="${currentCategory}"]`)?.classList.add('active');
+                    document.querySelector(`.mobile-menu-content a[data-cat="${currentCategory}"]`)?.classList.add('active');
                 });
             });
         }
@@ -2542,18 +2502,12 @@
         // ================================================================
         function renderBrands() {
             const container = $('brandFilter');
-            let brands = products
-                .filter(p => currentCategory === 'all' || p.category === currentCategory)
-                .map(p => p.brand)
-                .filter((b, i, arr) => arr.indexOf(b) === i)
-                .sort();
+            let brands = products.filter(p => currentCategory === 'all' || p.category === currentCategory).map(p => p.brand).filter((b, i, arr) => arr.indexOf(b) === i).sort();
             const allBtn = document.createElement('button');
             allBtn.className = `brand-filter-btn ${currentBrand === 'all' ? 'active' : ''}`;
             allBtn.dataset.brand = 'all';
             allBtn.textContent = 'Toutes';
-            allBtn.addEventListener('click', () => { currentBrand = 'all';
-                renderBrands();
-                renderProducts(); });
+            allBtn.addEventListener('click', () => { currentBrand = 'all'; renderBrands(); renderProducts(); });
             container.innerHTML = '';
             container.appendChild(allBtn);
             brands.forEach(brand => {
@@ -2561,9 +2515,7 @@
                 btn.className = `brand-filter-btn ${currentBrand === brand ? 'active' : ''}`;
                 btn.dataset.brand = brand;
                 btn.textContent = brand;
-                btn.addEventListener('click', () => { currentBrand = brand;
-                    renderBrands();
-                    renderProducts(); });
+                btn.addEventListener('click', () => { currentBrand = brand; renderBrands(); renderProducts(); });
                 container.appendChild(btn);
             });
         }
@@ -2574,7 +2526,7 @@
         function addToCart(productId) {
             const product = products.find(p => p.id === productId);
             if (!product) return;
-            if (product.stock <= 0) { showFlash('⚠️ Ce produit est en rupture de stock.', 2000); return; }
+            if (product.stock <= 0) { showFlash('⚠️ Rupture de stock.', 2000); return; }
             const existing = cart.find(item => item.id === productId);
             if (existing) {
                 if (existing.qty >= product.stock) { showFlash('⚠️ Stock insuffisant.', 2000); return; }
@@ -2583,13 +2535,10 @@
                 cart.push({ ...product, qty: 1 });
             }
             updateCartUI();
-            showFlash(`🛒 ${product.name} ajouté au panier.`, 1500);
+            showFlash(`🛒 ${product.name} ajouté.`, 1500);
         }
 
-        function removeFromCart(productId) {
-            cart = cart.filter(item => item.id !== productId);
-            updateCartUI();
-        }
+        function removeFromCart(productId) { cart = cart.filter(item => item.id !== productId); updateCartUI(); }
 
         function updateQty(productId, delta) {
             const item = cart.find(i => i.id === productId);
@@ -2598,8 +2547,7 @@
             if (!product) return;
             item.qty += delta;
             if (item.qty <= 0) { removeFromCart(productId); return; }
-            if (item.qty > product.stock) { item.qty = product.stock;
-                showFlash('⚠️ Stock maximum atteint.', 1500); }
+            if (item.qty > product.stock) { item.qty = product.stock; showFlash('⚠️ Stock max.', 1500); }
             updateCartUI();
         }
 
@@ -2617,24 +2565,7 @@
             let total = 0;
             container.innerHTML = cart.map(item => {
                 total += item.price * item.qty;
-                return `
-                        <div class="cart-item">
-                            <div style="width:60px;height:60px;background:#eae5de;display:flex;align-items:center;justify-content:center;border-radius:6px;font-size:28px;color:#a79e92;">
-                                ${item.image ? `<img src="${item.image}" alt="${item.name}">` : `<i class="fas fa-tshirt"></i>`}
-                            </div>
-                            <div class="cart-item-details">
-                                <h5>${item.name}</h5>
-                                <div style="font-size:12px;color:#888;">${item.brand}</div>
-                                <div class="cart-item-price">${item.price} $</div>
-                            </div>
-                            <div class="cart-item-qty">
-                                <button onclick="updateQty('${item.id}', -1)">−</button>
-                                <span>${item.qty}</span>
-                                <button onclick="updateQty('${item.id}', 1)">+</button>
-                            </div>
-                            <span class="remove-item" onclick="removeFromCart('${item.id}')"><i class="fas fa-times"></i></span>
-                        </div>
-                    `;
+                return `<div class="cart-item"><div style="width:60px;height:60px;background:#eae5de;display:flex;align-items:center;justify-content:center;border-radius:6px;font-size:28px;color:#a79e92;">${item.image ? `<img src="${item.image}" alt="${item.name}">` : `<i class="fas fa-tshirt"></i>`}</div><div class="cart-item-details"><h5>${item.name}</h5><div style="font-size:12px;color:#888;">${item.brand}</div><div class="cart-item-price">${item.price} $</div></div><div class="cart-item-qty"><button onclick="updateQty('${item.id}', -1)">−</button><span>${item.qty}</span><button onclick="updateQty('${item.id}', 1)">+</button></div><span class="remove-item" onclick="removeFromCart('${item.id}')"><i class="fas fa-times"></i></span></div>`;
             }).join('');
             totalEl.textContent = `Total : ${total.toFixed(2)} $`;
         }
@@ -2643,39 +2574,35 @@
         //  PAIEMENT
         // ================================================================
         $('payBtn').addEventListener('click', async () => {
-            if (cart.length === 0) { showFlash('⚠️ Votre panier est vide.', 2000); return; }
+            if (cart.length === 0) { showFlash('⚠️ Panier vide.', 2000); return; }
             const total = cart.reduce((sum, i) => sum + i.price * i.qty, 0);
             const method = document.querySelector('.payment-method.selected');
             const methodName = method ? method.dataset.method : 'Airtel Money';
-            showFlash(`⏳ Traitement du paiement par ${methodName}...`, 2000);
+            showFlash(`⏳ Traitement...`, 2000);
             try {
-                const orderData = {
+                await db.collection('orders').add({
                     items: JSON.parse(JSON.stringify(cart)),
                     total: total,
                     paymentMethod: methodName,
                     status: 'payée',
                     date: new Date().toISOString(),
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                };
-                await db.collection('orders').add(orderData);
+                });
                 for (const item of cart) {
                     const product = products.find(p => p.id === item.id);
                     if (product) {
-                        await db.collection('products').doc(item.id).update({
-                            stock: product.stock - item.qty
-                        });
+                        await db.collection('products').doc(item.id).update({ stock: product.stock - item.qty });
                     }
                 }
-                addNotification(`💰 Nouvelle commande de ${cart.length} articles - ${total.toFixed(2)} $ par ${methodName}`);
                 cart = [];
                 updateCartUI();
                 $('cartOverlay').classList.remove('open');
-                showFlash(`✅ Paiement de ${total.toFixed(2)} $ réussi ! Merci pour votre commande.`, 3000);
+                showFlash(`✅ Paiement de ${total.toFixed(2)} $ réussi !`, 3000);
                 await loadProducts();
                 if (isAdmin) renderAdmin();
             } catch (error) {
                 console.error('❌ Erreur paiement:', error);
-                showFlash('❌ Erreur lors du paiement: ' + error.message, 3000);
+                showFlash('❌ Erreur paiement.', 3000);
             }
         });
 
@@ -2683,12 +2610,9 @@
         //  ADMIN - RENDU DASHBOARD
         // ================================================================
         async function renderAdmin() {
-            if (!isAdmin) {
-                console.log('⚠️ renderAdmin appelé alors que isAdmin = false');
-                return;
-            }
+            if (!isAdmin) return;
+            console.log('📊 Rendu du dashboard...');
             
-            console.log('📊 Rendu du tableau de bord admin...');
             const totalProducts = products.length;
             const totalStock = products.reduce((sum, p) => sum + p.stock, 0);
             
@@ -2709,22 +2633,14 @@
 
                 const notifList = $('notifList');
                 const notifCount = $('notifCount');
-                const notifSnapshot = await db.collection('notifications')
-                    .orderBy('createdAt', 'desc')
-                    .limit(10)
-                    .get();
+                const notifSnapshot = await db.collection('notifications').orderBy('createdAt', 'desc').limit(10).get();
                 notifications = [];
                 notifSnapshot.forEach(doc => { notifications.push({ id: doc.id, ...doc.data() }); });
                 notifCount.textContent = notifications.length;
                 if (notifications.length === 0) {
                     notifList.innerHTML = `<div style="color:#999; text-align:center; padding:15px;">Aucune notification</div>`;
                 } else {
-                    notifList.innerHTML = notifications.map(n => `
-                            <div class="notif-item">
-                                <span>${n.message}</span>
-                                <span class="notif-time">${n.time || new Date(n.createdAt?.toDate()).toLocaleString() || 'N/A'}</span>
-                            </div>
-                        `).join('');
+                    notifList.innerHTML = notifications.map(n => `<div class="notif-item"><span>${n.message}</span><span class="notif-time">${n.time || 'N/A'}</span></div>`).join('');
                 }
             } catch (error) {
                 console.error('❌ Erreur chargement admin:', error);
@@ -2746,32 +2662,38 @@
                 `).join('');
             
             document.querySelectorAll('.admin-actions .fa-edit').forEach(btn => {
-                btn.addEventListener('click', () => { const id = btn.dataset.id;
-                    editProduct(id); });
+                btn.addEventListener('click', () => { const id = btn.dataset.id; editProduct(id); });
             });
             document.querySelectorAll('.admin-actions .fa-trash').forEach(btn => {
-                btn.addEventListener('click', () => { const id = btn.dataset.id;
-                    deleteProduct(id); });
+                btn.addEventListener('click', () => { const id = btn.dataset.id; deleteProduct(id); });
             });
-            
-            console.log('✅ Tableau de bord admin rendu avec succès');
         }
 
         // ================================================================
-        //  NOTIFICATIONS
+        //  NOTIFICATIONS EN TEMPS RÉEL
         // ================================================================
-        async function addNotification(message) {
-            try {
-                await db.collection('notifications').add({
-                    message,
-                    time: new Date().toLocaleString(),
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                    read: false
-                });
-            } catch (error) {
-                console.error('❌ Erreur ajout notification:', error);
-            }
-        }
+        db.collection('notifications')
+            .orderBy('createdAt', 'desc')
+            .limit(10)
+            .onSnapshot((snapshot) => {
+                if (isAdmin) {
+                    notifications = [];
+                    snapshot.forEach(doc => { notifications.push({ id: doc.id, ...doc.data() }); });
+                    const notifList = $('notifList');
+                    const notifCount = $('notifCount');
+                    notifCount.textContent = notifications.length;
+                    if (notifications.length === 0) {
+                        notifList.innerHTML = `<div style="color:#999; text-align:center; padding:15px;">Aucune notification</div>`;
+                    } else {
+                        notifList.innerHTML = notifications.map(n => `
+                                <div class="notif-item">
+                                    <span>${n.message}</span>
+                                    <span class="notif-time">${n.time || new Date(n.createdAt?.toDate()).toLocaleString() || 'N/A'}</span>
+                                </div>
+                            `).join('');
+                    }
+                }
+            });
 
         // ================================================================
         //  AFFICHAGE DE LA BOUTIQUE
@@ -2796,20 +2718,18 @@
                 renderProducts();
                 const label = link.textContent.trim();
                 $('currentCategoryLabel').textContent = label;
-                document.querySelectorAll('.nav-desktop a, .mobile-menu-content a').forEach(a => a.classList.remove(
-                    'active'));
+                document.querySelectorAll('.nav-desktop a, .mobile-menu-content a').forEach(a => a.classList.remove('active'));
                 document.querySelector(`.nav-desktop a[data-cat="${currentCategory}"]`)?.classList.add('active');
-                document.querySelector(`.mobile-menu-content a[data-cat="${currentCategory}"]`)?.classList.add(
-                    'active');
+                document.querySelector(`.mobile-menu-content a[data-cat="${currentCategory}"]`)?.classList.add('active');
             });
         });
 
         // ================================================================
         //  ÉVÉNEMENTS UI
         // ================================================================
-        $('cartIcon').addEventListener('click', () => { $('cartOverlay').classList.add('open');
-            updateCartUI(); });
+        $('cartIcon').addEventListener('click', () => { $('cartOverlay').classList.add('open'); updateCartUI(); });
         $('closeCart').addEventListener('click', () => { $('cartOverlay').classList.remove('open'); });
+        
         document.querySelectorAll('.payment-method').forEach(el => {
             el.addEventListener('click', () => {
                 document.querySelectorAll('.payment-method').forEach(m => m.classList.remove('selected'));
@@ -2843,66 +2763,26 @@
         }
 
         // ================================================================
-        //  INIT - AVEC INITIALISATION AUTOMATIQUE
+        //  INIT - SIMPLIFIÉ ET CORRIGÉ
         // ================================================================
         async function init() {
             console.log('🚀 INITIALISATION DE L\'APPLICATION...');
             console.log('========================================');
             
-            // ÉTAPE 1: Initialisation automatique de l'admin
-            console.log('📌 ÉTAPE 1: Initialisation de l\'admin...');
-            const adminInitialized = await initializeAdmin();
-            if (adminInitialized) {
-                console.log('✅ Admin configuré avec succès');
-            } else {
-                console.log('⚠️ L\'admin n\'a pas pu être configuré automatiquement');
-                showFlash('⚠️ Erreur d\'initialisation. Vérifiez votre connexion internet.', 3000);
-            }
+            // ÉTAPE 1: Initialiser Firestore
+            console.log('📌 ÉTAPE 1: Initialisation de Firestore...');
+            await initializeFirestore();
             
-            // ÉTAPE 2: Chargement des produits
+            // ÉTAPE 2: Charger les produits
             console.log('📌 ÉTAPE 2: Chargement des produits...');
             await loadProducts();
             updateCartUI();
             
-            // ÉTAPE 3: Écoute des notifications en temps réel
-            console.log('📌 ÉTAPE 3: Activation des notifications en temps réel...');
-            db.collection('notifications')
-                .orderBy('createdAt', 'desc')
-                .limit(10)
-                .onSnapshot((snapshot) => {
-                    if (isAdmin) {
-                        notifications = [];
-                        snapshot.forEach(doc => { notifications.push({ id: doc.id, ...doc.data() }); });
-                        const notifList = $('notifList');
-                        const notifCount = $('notifCount');
-                        notifCount.textContent = notifications.length;
-                        if (notifications.length === 0) {
-                            notifList.innerHTML =
-                                `<div style="color:#999; text-align:center; padding:15px;">Aucune notification</div>`;
-                        } else {
-                            notifList.innerHTML = notifications.map(n => `
-                                    <div class="notif-item">
-                                        <span>${n.message}</span>
-                                        <span class="notif-time">${n.time || new Date(n.createdAt?.toDate()).toLocaleString() || 'N/A'}</span>
-                                    </div>
-                                `).join('');
-                        }
-                    }
-                });
-            
             console.log('========================================');
-            console.log('✅ APPLICATION INITIALISÉE AVEC SUCCÈS !');
-            console.log('👔 DLT BOUTIQUE - Atelier Paris');
+            console.log('✅ APPLICATION PRÊTE !');
             console.log('👑 Admin: admin@dlt.com / admin123');
-            console.log('📸 Upload d\'images vers Firebase Storage activé');
-            console.log('💳 Paiements: Airtel Money, M-Pesa, Orange Money, Visa, Mastercard, PayPal');
-            console.log('📊 Analytics activé');
-            console.log('🔔 Notifications en temps réel activées');
-            console.log('📌 Pour vous connecter en tant qu\'admin, utilisez les identifiants ci-dessus.');
-            console.log('📌 Le dashboard admin apparaîtra automatiquement après la connexion.');
+            console.log('📌 Cliquez sur "Admin" pour vous connecter.');
             console.log('========================================');
-            
-            initialSetupDone = true;
         }
 
         // Lancer l'application
