@@ -1709,7 +1709,6 @@
                 <a data-cat="chemise">Chemises</a>
                 <a data-cat="pantalon">Pantalons</a>
                 <a data-cat="polo">Polos</a>
-                <a data-cat="culotte">Culottes</a>
                 <a data-cat="chaussure">Chaussures</a>
                 <a data-cat="mariage">Mariage</a>
                 <a data-cat="accessoire">Accessoires</a>
@@ -1742,7 +1741,6 @@
             <a data-cat="chemise"><i class="fas fa-shirt"></i> Chemises</a>
             <a data-cat="pantalon"><i class="fas fa-trousers"></i> Pantalons</a>
             <a data-cat="polo"><i class="fas fa-tshirt"></i> Polos</a>
-            <a data-cat="culotte"><i class="fas fa-shorts"></i> Culottes</a>
             <a data-cat="chaussure"><i class="fas fa-shoe-prints"></i> Chaussures</a>
             <a data-cat="mariage"><i class="fas fa-ring"></i> Mariage</a>
             <a data-cat="accessoire"><i class="fas fa-gem"></i> Accessoires</a>
@@ -1842,14 +1840,11 @@
             <div class="bulk-upload-section" id="bulkUploadSection">
                 <h4><i class="fas fa-images"></i> Gestion des images</h4>
                 <p style="color:#888; font-size:14px; margin-bottom:15px;">
-                    Sélectionnez une image pour chaque produit. Cliquez sur "Parcourir" pour choisir une image.
+                    Les images sont chargées depuis le dossier images/ du dépôt GitHub.
                 </p>
                 <div class="bulk-grid" id="bulkGrid">
-                    <!-- Les produits avec upload d'images seront affichés ici -->
+                    <!-- Les produits avec images seront affichés ici -->
                 </div>
-                <button class="btn-primary" id="bulkUploadBtn" style="margin-top:15px; width:100%; justify-content:center;">
-                    <i class="fas fa-cloud-upload-alt"></i> Uploader toutes les images sélectionnées
-                </button>
             </div>
 
             <div style="margin-bottom:25px;">
@@ -1868,7 +1863,6 @@
                     <option value="chemise">Chemise</option>
                     <option value="pantalon">Pantalon</option>
                     <option value="polo">Polo</option>
-                    <option value="culotte">Culotte</option>
                     <option value="chaussure">Chaussure</option>
                     <option value="mariage">Mariage</option>
                     <option value="accessoire">Accessoire</option>
@@ -1880,8 +1874,8 @@
                     <div class="file-upload-wrapper">
                         <div class="file-upload-label">
                             <i class="fas fa-cloud-upload-alt"></i>
-                            <span id="fileLabel">Choisir une image</span>
-                            <input type="file" id="adminProductImage" accept="image/*">
+                            <span id="fileLabel">URL de l'image (facultatif)</span>
+                            <input type="text" id="adminProductImageUrl" placeholder="https://...">
                         </div>
                     </div>
                     <div class="image-preview" id="imagePreview">
@@ -1927,7 +1921,7 @@
     <div class="flash-message" id="flashMessage"></div>
 
     <!-- ============================================================
-    JAVASCRIPT - AVEC SYSTEME D'UPLOAD D'IMAGES
+    JAVASCRIPT - AVEC IMAGES GITHUB
     ============================================================ -->
     <script>
         // ================================================================
@@ -1952,50 +1946,50 @@
         const auth = firebase.auth();
 
         // ================================================================
-        //  LISTE DES IMAGES PAR CATÉGORIE (pour le bulk upload)
+        //  BASE URL POUR LES IMAGES SUR GITHUB
+        // ================================================================
+        const GITHUB_BASE_URL = 'https://jordan-lydia.github.io/dlt_boutique/';
+        
+        // ================================================================
+        //  LISTE DES IMAGES PAR CATÉGORIE (CHEMINS GITHUB)
         // ================================================================
         const IMAGE_FILES = {
-            veste: [
+            vestes: [
                 'veste (1).jpeg', 'veste (2).jpeg', 'veste (3).jpeg', 'veste (4).jpeg',
                 'veste (5).jpeg', 'veste (6).jpeg', 'veste (7).jpeg', 'veste (8).jpeg',
                 'veste (9).jpeg', 'veste (10).jpeg', 'veste (11).jpeg', 'veste (12).jpeg',
                 'veste (13).jpeg', 'veste (14).jpeg', 'veste (15).jpeg', 'veste (16).jpeg',
                 'veste (17).jpeg', 'veste (18).jpeg', 'veste (19).jpeg', 'veste (20).jpeg',
                 'veste (21).jpeg', 'veste (22).jpeg', 'veste (23).jpeg', 'veste (24).jpeg',
-                'veste (25).jpeg', 'veste (26).jpeg', 'veste (27).jpeg', 'veste (28).jpeg',
-                'veste (29).jpeg'
+                'veste (25).jpeg', 'veste (26).jpeg', 'veste (27).jpeg'
             ],
-            chemise: [
+            CHEMISE: [
                 'chemise (1).jpeg', 'chemise (2).jpeg', 'chemise (3).jpeg', 'chemise (4).jpeg',
                 'chemise (5).jpeg', 'chemise (6).jpeg', 'chemise (7).jpeg', 'chemise (8).jpeg',
                 'chemise (9).jpeg', 'chemise (10).jpeg', 'chemise (11).jpeg'
             ],
-            pantalon: [
+            PANTALON: [
                 'pantalon (1).jpeg', 'pantalon (2).jpeg', 'pantalon (3).jpeg', 'pantalon (4).jpeg',
                 'pantalon (5).jpeg', 'pantalon (6).jpeg', 'pantalon (7).jpeg', 'pantalon (8).jpeg',
                 'pantalon (9).jpeg', 'pantalon (10).jpeg', 'pantalon (11).jpeg', 'pantalon (12).jpeg',
-                'pantalon (13).jpeg', 'pantalon (14).jpeg', 'pantalon (15).jpeg', 'pantalon (16).jpeg',
-                'pantalon (17).jpeg', 'pantalon (18).jpeg', 'pantalon (19).jpeg', 'pantalon (20).jpeg',
-                'pantalon (21).jpeg', 'pantalon (22).jpeg', 'pantalon (23).jpeg', 'pantalon (24).jpeg',
-                'pantalon (25).jpeg', 'pantalon (26).jpeg', 'pantalon (27).jpeg', 'pantalon (28).jpeg',
-                'pantalon (29).jpeg', 'pantalon (30).jpeg'
+                'pantalon (13).jpeg', 'pantalon (14).jpeg', 'pantalon (15).jpeg', 'pantalon (16).jpeg'
             ],
-            polo: [
+            POLO: [
                 'polo (1).jpeg', 'polo (2).jpeg', 'polo (3).jpeg', 'polo (4).jpeg',
                 'polo (5).jpeg', 'polo (6).jpeg', 'polo (7).jpeg', 'polo (8).jpeg',
                 'polo (9).jpeg', 'polo (10).jpeg', 'polo (11).jpeg', 'polo (12).jpeg',
                 'polo (13).jpeg', 'polo (14).jpeg'
             ],
-            chaussure: [
+            CHAUSSIRE: [
                 'chaussire (1).jpeg', 'chaussire (2).jpeg', 'chaussire (3).jpeg', 'chaussire (4).jpeg',
                 'chaussire (5).jpeg', 'chaussire (6).jpeg', 'chaussire (7).jpeg', 'chaussire (8).jpeg',
                 'chaussire (9).jpeg', 'chaussire (10).jpeg', 'chaussire (11).jpeg'
             ],
-            mariage: [
+           MARIAGE: [
                 'mariage (1).jpeg', 'mariage (2).jpeg', 'mariage (3).jpeg', 'mariage (4).jpeg',
                 'mariage (5).jpeg', 'mariage (6).jpeg', 'mariage (7).jpeg'
             ],
-            accessoire: [
+            ACCESSOIRES: [
                 'ACCESSOIRE VESTE (1).jpeg', 'ACCESSOIRE VESTE (2).jpeg', 'ACCESSOIRE VESTE (3).jpeg',
                 'ACCESSOIRE VESTE (4).jpeg', 'ACCESSOIRE VESTE (5).jpeg', 'ACCESSOIRE VESTE (6).jpeg'
             ]
@@ -2023,30 +2017,40 @@
         const flashMsg = $('flashMessage');
 
         // ================================================================
-        //  FONCTION POUR UPLOADER UNE IMAGE VERS FIREBASE STORAGE
+        //  FONCTION POUR OBTENIR LE CHEMIN DE L'IMAGE SUR GITHUB
         // ================================================================
-        async function uploadImageToStorage(file, productId) {
-            if (!file) return null;
-            try {
-                console.log('📤 Upload de l\'image pour le produit:', productId);
-                const fileName = `${productId}_${Date.now()}_${file.name}`;
-                const storageRef = storage.ref(`products/${fileName}`);
-                const uploadTask = storageRef.put(file);
-                const snapshot = await uploadTask;
-                const downloadURL = await snapshot.ref.getDownloadURL();
-                console.log('✅ Image uploadée:', downloadURL);
-                return downloadURL;
-            } catch (error) {
-                console.error('❌ Erreur upload image:', error);
-                return null;
+        function getImagePath(product) {
+            if (!product) return 'https://via.placeholder.com/400x400/1a1a1a/d4af37?text=No+Image';
+            
+            // Si l'image est déjà une URL complète
+            if (product.image && (product.image.startsWith('http://') || product.image.startsWith('https://'))) {
+                return product.image;
             }
+            
+            // Si l'image est un chemin relatif
+            if (product.image && product.image.includes('/')) {
+                return `${GITHUB_BASE_URL}${product.image}`;
+            }
+            
+            // Si on a le nom de l'image et la catégorie
+            if (product.category && product.image) {
+                const categoryFolder = product.category === 'accessoire' ? 'ACCESSOIRES' : 
+                                      product.category === 'chemise' ? 'CHEMISE' :
+                                      product.category === 'chaussure' ? 'CHAUSSURE' :
+                                      product.category === 'veste' ? 'vestes' :
+                                      product.category.toUpperCase();
+                return `${GITHUB_BASE_URL}${categoryFolder}/${product.image}`;
+            }
+            
+            // Fallback
+            return 'https://via.placeholder.com/400x400/1a1a1a/d4af37?text=No+Image';
         }
 
         // ================================================================
-        //  INITIALISATION
+        //  INITIALISATION DE FIRESTORE AVEC IMAGES GITHUB
         // ================================================================
         async function initializeFirestore() {
-            console.log('🔄 Initialisation de Firestore...');
+            console.log('🔄 Initialisation de Firestore avec images GitHub...');
             
             try {
                 // Vérifier et créer l'admin
@@ -2085,7 +2089,7 @@
                 const productsSnapshot = await db.collection('products').limit(1).get();
                 
                 if (productsSnapshot.empty) {
-                    console.log('📦 Création des produits...');
+                    console.log('📦 Création des produits avec images GitHub...');
                     
                     // Se connecter en tant qu'admin
                     await auth.signInWithEmailAndPassword('admin@dlt.com', 'admin123');
@@ -2099,26 +2103,36 @@
                             const imageName = images[i];
                             const productName = `${categoryLabel} ${i + 1}`;
                             
-                            // Créer le produit avec une image placeholder
-                            const productRef = await db.collection('products').add({
+                            // Déterminer le dossier de la catégorie
+                            const categoryFolder = category === 'accessoire' ? 'ACCESSOIRES' : 
+                                                  category === 'chemise' ? 'CHEMISE' :
+                                                  category === 'chaussure' ? 'CHAUSSURE' :
+                                                  category === 'veste' ? 'vestes' :
+                                                  category.toUpperCase();
+                            
+                            // Utiliser le chemin GitHub
+                            const imagePath = `${categoryFolder}/${imageName}`;
+                            
+                            const productData = {
                                 name: productName,
                                 category: category,
                                 brand: 'DLT Collection',
-                                price: 0,
+                                price: Math.floor(Math.random() * 150) + 50,
                                 stock: Math.floor(Math.random() * 30) + 5,
-                                image: `https://via.placeholder.com/400x400/1a1a1a/d4af37?text=${encodeURIComponent(productName)}`,
-                                badge: i === 0 ? 'Nouveau' : '',
+                                image: imagePath,
+                                badge: i === 0 ? 'Nouveau' : (i === 1 ? 'Exclusif' : ''),
                                 description: `${categoryLabel} de qualité, modèle ${i + 1}`,
                                 createdAt: firebase.firestore.FieldValue.serverTimestamp(),
                                 updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                            });
+                            };
                             
+                            await db.collection('products').add(productData);
                             productCount++;
                         }
                     }
                     
                     await auth.signOut();
-                    console.log(`✅ ${productCount} produits créés !`);
+                    console.log(`✅ ${productCount} produits créés avec images GitHub !`);
                 }
 
                 console.log('✅ Firestore initialisé avec succès !');
@@ -2292,7 +2306,7 @@
         carouselImages.slice(0, 5).forEach((img, index) => {
             const slide = document.createElement('div');
             slide.className = `slide ${index === 0 ? 'active' : ''}`;
-            slide.style.backgroundImage = `url('${img}')`;
+            slide.style.backgroundImage = `url('${GITHUB_BASE_URL}carocel/${img}')`;
             const text = carouselTexts[index % carouselTexts.length];
             slide.innerHTML = `
                     <div class="slide-content">
@@ -2389,114 +2403,26 @@
             
             grid.innerHTML = products.map(p => `
                     <div class="bulk-item" data-id="${p.id}">
-                        <img src="${p.image || 'https://via.placeholder.com/80/1a1a1a/666?text=No+Image'}" alt="${p.name}" 
-                             style="cursor:pointer;" onclick="document.getElementById('bulkInput_${p.id}').click()">
+                        <img src="${getImagePath(p)}" alt="${p.name}" 
+                             onerror="this.src='https://via.placeholder.com/80/1a1a1a/666?text=No+Image'">
                         <div class="bulk-name">${p.name}</div>
-                        <input type="file" id="bulkInput_${p.id}" accept="image/*" style="display:none;" 
-                               onchange="handleBulkFileSelect('${p.id}', this)">
-                        <span class="bulk-status pending" id="bulkStatus_${p.id}">En attente</span>
+                        <span class="bulk-status uploaded">✅ GitHub</span>
                     </div>
                 `).join('');
         }
 
         // ================================================================
-        //  GESTION BULK UPLOAD
-        // ================================================================
-        let bulkFiles = {};
-
-        window.handleBulkFileSelect = function(productId, input) {
-            const file = input.files[0];
-            if (file) {
-                bulkFiles[productId] = file;
-                const status = document.getElementById(`bulkStatus_${productId}`);
-                status.textContent = 'Sélectionné';
-                status.className = 'bulk-status pending';
-                
-                // Afficher l'aperçu
-                const item = document.querySelector(`.bulk-item[data-id="${productId}"] img`);
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    item.src = e.target.result;
-                };
-                reader.readAsDataURL(file);
-            }
-        };
-
-        $('bulkUploadBtn').addEventListener('click', async () => {
-            if (!isAdmin) { showFlash('⚠️ Vous devez être administrateur.', 2000); return; }
-            
-            const files = Object.keys(bulkFiles);
-            if (files.length === 0) {
-                showFlash('⚠️ Veuillez sélectionner au moins une image.', 2000);
-                return;
-            }
-
-            const btn = $('bulkUploadBtn');
-            btn.disabled = true;
-            btn.innerHTML = '<span class="loading-spinner"></span> Upload en cours...';
-
-            let uploaded = 0;
-            let errors = 0;
-
-            for (const productId of files) {
-                try {
-                    const file = bulkFiles[productId];
-                    const status = document.getElementById(`bulkStatus_${productId}`);
-                    status.textContent = 'Upload...';
-                    status.className = 'bulk-status pending';
-                    
-                    const url = await uploadImageToStorage(file, productId);
-                    
-                    if (url) {
-                        await db.collection('products').doc(productId).update({ 
-                            image: url,
-                            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                        });
-                        status.textContent = '✅ Uploadé';
-                        status.className = 'bulk-status uploaded';
-                        uploaded++;
-                    } else {
-                        status.textContent = '❌ Erreur';
-                        status.className = 'bulk-status error';
-                        errors++;
-                    }
-                } catch (error) {
-                    console.error('❌ Erreur upload pour', productId, error);
-                    const status = document.getElementById(`bulkStatus_${productId}`);
-                    status.textContent = '❌ Erreur';
-                    status.className = 'bulk-status error';
-                    errors++;
-                }
-            }
-
-            btn.disabled = false;
-            btn.innerHTML = '<i class="fas fa-cloud-upload-alt"></i> Uploader toutes les images sélectionnées';
-            
-            showFlash(`✅ ${uploaded} images uploadées, ${errors} erreurs.`, 3000);
-            
-            // Recharger les produits pour mettre à jour les images
-            await loadProducts();
-            
-            // Vider le cache des fichiers
-            bulkFiles = {};
-        });
-
-        // ================================================================
         //  FORMULAIRE ADMIN
         // ================================================================
-        $('adminProductImage').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                selectedFile = file;
-                $('fileLabel').textContent = file.name;
-                const reader = new FileReader();
-                reader.onload = function(event) {
-                    const preview = $('imagePreview');
-                    const img = $('previewImg');
-                    img.src = event.target.result;
-                    preview.style.display = 'block';
-                };
-                reader.readAsDataURL(file);
+        $('adminProductImageUrl').addEventListener('input', function(e) {
+            const url = e.target.value.trim();
+            if (url) {
+                const preview = $('imagePreview');
+                const img = $('previewImg');
+                img.src = url;
+                preview.style.display = 'block';
+            } else {
+                $('imagePreview').style.display = 'none';
             }
         });
 
@@ -2516,6 +2442,7 @@
             const stock = parseInt($('adminProductStock').value) || 0;
             const badge = $('adminProductBadge').value;
             const description = $('adminProductDescription').value.trim();
+            const imageUrl = $('adminProductImageUrl').value.trim();
 
             if (!name || !category || !brand || stock < 0) {
                 showFlash('⚠️ Veuillez remplir tous les champs correctement.', 2000);
@@ -2525,11 +2452,6 @@
             }
 
             try {
-                let imageUrl = $('adminProductImage').dataset.existingUrl || '';
-                if (selectedFile) {
-                    const productId = id || Date.now().toString();
-                    imageUrl = await uploadImageToStorage(selectedFile, productId);
-                }
                 const productData = { 
                     name, 
                     category, 
@@ -2552,9 +2474,7 @@
                 $('adminForm').reset();
                 $('editProductId').value = '';
                 $('imagePreview').style.display = 'none';
-                $('fileLabel').textContent = 'Choisir une image';
-                selectedFile = null;
-                delete $('adminProductImage').dataset.existingUrl;
+                $('adminProductImageUrl').value = '';
                 await loadProducts();
             } catch (error) {
                 console.error('❌ Erreur sauvegarde:', error);
@@ -2581,10 +2501,9 @@
             if (product.image) {
                 const preview = $('imagePreview');
                 const img = $('previewImg');
-                img.src = product.image;
+                img.src = getImagePath(product);
                 preview.style.display = 'block';
-                $('adminProductImage').dataset.existingUrl = product.image;
-                $('fileLabel').textContent = 'Image actuelle';
+                $('adminProductImageUrl').value = product.image;
             }
             $('adminForm').scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
@@ -2619,10 +2538,12 @@
                 grid.innerHTML = `<p style="grid-column:1/-1; text-align:center; padding:40px; color:#999;">Aucun produit.</p>`;
                 return;
             }
-            grid.innerHTML = filtered.map(p => `
+            grid.innerHTML = filtered.map(p => {
+                const imageSrc = getImagePath(p);
+                return `
                     <div class="product-card" data-id="${p.id}">
                         <div class="product-image">
-                            ${p.image ? `<img src="${p.image}" alt="${p.name}">` : `<span class="placeholder-icon"><i class="fas fa-tshirt"></i></span>`}
+                            <img src="${imageSrc}" alt="${p.name}" onerror="this.src='https://via.placeholder.com/400x400/1a1a1a/d4af37?text=No+Image'">
                             ${p.badge ? `<div class="product-badge">${p.badge}</div>` : ''}
                             <div class="product-brand">${p.brand}</div>
                         </div>
@@ -2633,7 +2554,8 @@
                             <button class="add-to-cart-btn" data-id="${p.id}"><i class="fas fa-plus"></i> Ajouter au panier</button>
                         </div>
                     </div>
-                `).join('');
+                `;
+            }).join('');
             document.querySelectorAll('.add-to-cart-btn').forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     e.stopPropagation();
@@ -2648,9 +2570,9 @@
         // ================================================================
         function renderCategories() {
             const grid = $('categoriesGrid');
-            const cats = ['all', 'veste', 'chemise', 'pantalon', 'polo', 'culotte', 'chaussure', 'mariage', 'accessoire'];
-            const labels = { all: 'Tous', veste: 'Vestes', chemise: 'Chemises', pantalon: 'Pantalons', polo: 'Polos', culotte: 'Culottes', chaussure: 'Chaussures', mariage: 'Mariage', accessoire: 'Accessoires' };
-            const icons = { all: 'fa-th-large', veste: 'fa-jacket', chemise: 'fa-shirt', pantalon: 'fa-trousers', polo: 'fa-tshirt', culotte: 'fa-shorts', chaussure: 'fa-shoe-prints', mariage: 'fa-ring', accessoire: 'fa-gem' };
+            const cats = ['all', 'veste', 'chemise', 'pantalon', 'polo', 'chaussure', 'mariage', 'accessoire'];
+            const labels = { all: 'Tous', veste: 'Vestes', chemise: 'Chemises', pantalon: 'Pantalons', polo: 'Polos', chaussure: 'Chaussures', mariage: 'Mariage', accessoire: 'Accessoires' };
+            const icons = { all: 'fa-th-large', veste: 'fa-jacket', chemise: 'fa-shirt', pantalon: 'fa-trousers', polo: 'fa-tshirt', chaussure: 'fa-shoe-prints', mariage: 'fa-ring', accessoire: 'fa-gem' };
             grid.innerHTML = cats.map(cat => {
                 const count = products.filter(p => cat === 'all' || p.category === cat).length;
                 return `<div class="category-card ${cat === currentCategory ? 'active' : ''}" data-cat="${cat}"><i class="fas ${icons[cat] || 'fa-tag'}"></i><span>${labels[cat]}</span><span class="count">${count} articles</span></div>`;
@@ -2738,7 +2660,8 @@
             let total = 0;
             container.innerHTML = cart.map(item => {
                 total += (item.price || 0) * item.qty;
-                return `<div class="cart-item"><div style="width:60px;height:60px;background:#eae5de;display:flex;align-items:center;justify-content:center;border-radius:6px;font-size:28px;color:#a79e92;">${item.image ? `<img src="${item.image}" alt="${item.name}">` : `<i class="fas fa-tshirt"></i>`}</div><div class="cart-item-details"><h5>${item.name}</h5><div style="font-size:12px;color:#888;">${item.brand}</div><div class="cart-item-price">${item.price || 'À définir'} $</div></div><div class="cart-item-qty"><button onclick="updateQty('${item.id}', -1)">−</button><span>${item.qty}</span><button onclick="updateQty('${item.id}', 1)">+</button></div><span class="remove-item" onclick="removeFromCart('${item.id}')"><i class="fas fa-times"></i></span></div>`;
+                const imageSrc = getImagePath(item);
+                return `<div class="cart-item"><div style="width:60px;height:60px;background:#eae5de;display:flex;align-items:center;justify-content:center;border-radius:6px;font-size:28px;color:#a79e92;"><img src="${imageSrc}" alt="${item.name}" onerror="this.style.display='none';this.parentElement.innerHTML='<i class=\\'fas fa-tshirt\\'></i>'"></div><div class="cart-item-details"><h5>${item.name}</h5><div style="font-size:12px;color:#888;">${item.brand}</div><div class="cart-item-price">${item.price || 'À définir'} $</div></div><div class="cart-item-qty"><button onclick="updateQty('${item.id}', -1)">−</button><span>${item.qty}</span><button onclick="updateQty('${item.id}', 1)">+</button></div><span class="remove-item" onclick="removeFromCart('${item.id}')"><i class="fas fa-times"></i></span></div>`;
             }).join('');
             totalEl.textContent = `Total : ${total.toFixed(2)} $`;
         }
@@ -2926,11 +2849,14 @@
             console.log('✅ APPLICATION PRÊTE !');
             console.log(`📦 ${products.length} produits chargés`);
             console.log('👑 Admin: admin@dlt.com / admin123');
-            console.log('📌 Pour ajouter des images:');
-            console.log('   1. Connectez-vous en tant qu\'admin');
-            console.log('   2. Dans la section "Gestion des images", cliquez sur une image');
-            console.log('   3. Sélectionnez l\'image correspondante');
-            console.log('   4. Cliquez sur "Uploader toutes les images sélectionnées"');
+            console.log('📁 Structure des images sur GitHub:');
+            console.log('   https://jordan-lydia.github.io/dlt_boutique/vestes/');
+            console.log('   https://jordan-lydia.github.io/dlt_boutique/CHEMISE/');
+            console.log('   https://jordan-lydia.github.io/dlt_boutique/PANTALON/');
+            console.log('   https://jordan-lydia.github.io/dlt_boutique/POLO/');
+            console.log('   https://jordan-lydia.github.io/dlt_boutique/CHAUSSURE/');
+            console.log('   https://jordan-lydia.github.io/dlt_boutique/MARIAGE/');
+            console.log('   https://jordan-lydia.github.io/dlt_boutique/ACCESSOIRES/');
             console.log('========================================');
         }
 
