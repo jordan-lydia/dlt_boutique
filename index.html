@@ -89,6 +89,14 @@
             font-family: 'Playfair Display', serif;
             font-size: 27px;
             letter-spacing: -.04em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo img {
+            height: 40px;
+            width: auto;
         }
 
         .nav-links {
@@ -175,12 +183,11 @@
             backdrop-filter: blur(2px);
         }
 
-        /* Image de fond derrière le texte */
         .hero-bg {
             position: absolute;
             inset: 0;
             z-index: 0;
-            background: url('logo.jfif') center/cover;
+            background: url('carrousel (1).jpg') center/cover;
             opacity: 0.3;
         }
 
@@ -468,7 +475,7 @@
         }
 
         .brands-hero {
-            background: linear-gradient(90deg, rgba(28, 12, 9, .72), rgba(28, 12, 9, .16)), url('https://images.unsplash.com/photo-1490578474895-699cd4e2cf59?auto=format&fit=crop&w=1800&q=88') center/cover;
+            background: linear-gradient(90deg, rgba(28, 12, 9, .72), rgba(28, 12, 9, .16)), url('carrousel (2).jpeg') center/cover;
             color: #fff;
             min-height: 440px;
             padding: clamp(70px, 10vw, 135px) 8%;
@@ -700,7 +707,7 @@
             opacity: 1;
         }
 
-        /* ---- STORY ---- */
+        /* ---- STORY / À PROPOS ---- */
         .story {
             align-items: center;
             display: grid;
@@ -709,14 +716,39 @@
         }
 
         .story-image {
-            background: url('https://images.unsplash.com/photo-1551488831-00ddcb6c6bd3?auto=format&fit=crop&w=1000&q=85') center/cover;
+            background: url('carrousel (3).jpeg') center/cover;
             min-height: 470px;
+            border-radius: var(--radius);
+        }
+
+        .story-copy {
+            padding: 20px 0;
+        }
+
+        .story-copy .eyebrow {
+            display: inline-block;
+            margin-bottom: 12px;
+        }
+
+        .story-copy h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 42px;
+            font-weight: 500;
+            letter-spacing: -.04em;
+            margin: 0 0 20px 0;
+            line-height: 1.1;
         }
 
         .story-copy p {
             color: var(--muted);
             line-height: 1.8;
             max-width: 430px;
+            margin-bottom: 16px;
+        }
+
+        .story-copy .text-link {
+            margin-top: 8px;
+            display: inline-block;
         }
 
         /* ---- PERKS ---- */
@@ -784,29 +816,6 @@
             letter-spacing: .12em;
             margin: 4px 0 17px;
             text-transform: uppercase;
-        }
-
-        .newsletter {
-            display: flex;
-            border-bottom: 1px solid #64706a;
-            margin-top: 20px;
-        }
-
-        .newsletter input {
-            background: transparent;
-            border: 0;
-            color: #fff;
-            min-width: 0;
-            outline: 0;
-            padding: 12px 0;
-            width: 100%;
-        }
-
-        .newsletter button {
-            background: transparent;
-            border: 0;
-            color: #fff;
-            font-size: 20px;
         }
 
         .copyright {
@@ -1105,6 +1114,14 @@
                 order: 2;
             }
 
+            .story-copy h2 {
+                font-size: 32px;
+            }
+
+            .story-copy p {
+                max-width: 100%;
+            }
+
             .brands-inner {
                 padding: 60px 20px;
             }
@@ -1192,7 +1209,10 @@
     <header>
         <nav class="nav">
             <button class="icon-btn menu-btn" id="menuBtn" aria-label="Ouvrir le menu">☰</button>
-            <a class="logo" href="#accueil">D.L.T Boutique</a>
+            <a class="logo" href="#accueil">
+                <img src="logo.png" alt="D.L.T Boutique" />
+                D.L.T Boutique
+            </a>
             <div class="nav-links" id="navLinks">
                 <a href="#accueil">Débuter</a>
                 <a href="#boutique">Nouvelle collection</a>
@@ -1239,19 +1259,19 @@
             </div>
             <div class="category-grid">
                 <a class="category" href="#boutique" data-category="Costumes">
-                    <img src="https://images.unsplash.com/photo-1598808503746-f34c53b9323e?auto=format&fit=crop&w=700&q=80" alt="Costume homme élégant" />
+                    <img src="carrousel (1).jpeg" alt="Costume homme élégant" />
                     <span>Costumes</span>
                 </a>
                 <a class="category" href="#boutique" data-category="Vestes">
-                    <img src="https://images.unsplash.com/photo-1551488831-00ddcb6c6bd3?auto=format&fit=crop&w=700&q=80" alt="Veste de collection" />
+                    <img src="vestes/veste (1).jpeg" alt="Veste de collection" />
                     <span>Vestes</span>
                 </a>
                 <a class="category" href="#boutique" data-category="Chemises">
-                    <img src="https://images.unsplash.com/photo-1603252109303-2751441dd157?auto=format&fit=crop&w=700&q=80" alt="Chemise homme" />
+                    <img src="CHEMISE/chemise (1).jpeg" alt="Chemise homme" />
                     <span>Chemises</span>
                 </a>
                 <a class="category" href="#boutique" data-category="Accessoires">
-                    <img src="https://images.unsplash.com/photo-1617127365659-c47fa864d8bc?auto=format&fit=crop&w=700&q=80" alt="Accessoires masculins" />
+                    <img src="ACCESSOIRES/accessoire (1).jpeg" alt="Accessoires masculins" />
                     <span>Accessoires</span>
                 </a>
             </div>
@@ -1271,23 +1291,43 @@
                     <div class="carousel-track" id="carouselTrack">
                         <!-- Slide 1 -->
                         <div class="carousel-slide">
-                            <img src="https://images.unsplash.com/photo-1598808503746-f34c53b9323e?auto=format&fit=crop&w=900&q=85" alt="Costume élégant" />
-                            <img src="https://images.unsplash.com/photo-1551488831-00ddcb6c6bd3?auto=format&fit=crop&w=900&q=85" alt="Veste de luxe" />
+                            <img src="carrousel (1).jpeg" alt="Collection élégante" />
+                            <img src="carrousel (2).jpeg" alt="Style raffiné" />
                         </div>
                         <!-- Slide 2 -->
                         <div class="carousel-slide">
-                            <img src="https://images.unsplash.com/photo-1566174053879-31528523f8ae?auto=format&fit=crop&w=900&q=85" alt="Robe de soirée" />
-                            <img src="https://images.unsplash.com/photo-1519657337289-077653f724ed?auto=format&fit=crop&w=900&q=85" alt="Robe de mariage" />
+                            <img src="carrousel (3).jpeg" alt="Tenue de soirée" />
+                            <img src="carrousel (4).jpeg" alt="Accessoires luxe" />
                         </div>
                         <!-- Slide 3 -->
                         <div class="carousel-slide">
-                            <img src="https://images.unsplash.com/photo-1614252369475-531eba835eb1?auto=format&fit=crop&w=900&q=85" alt="Accessoires luxe" />
-                            <img src="https://images.unsplash.com/photo-1539533018447-63fcce2678e3?auto=format&fit=crop&w=900&q=85" alt="Manteau héritage" />
+                            <img src="carrousel (5).jpeg" alt="Costume sur mesure" />
+                            <img src="carrousel (6).jpeg" alt="Veste élégante" />
                         </div>
                         <!-- Slide 4 -->
                         <div class="carousel-slide">
-                            <img src="https://images.unsplash.com/photo-1603252109303-2751441dd157?auto=format&fit=crop&w=900&q=85" alt="Chemise blanche" />
-                            <img src="https://images.unsplash.com/photo-1610652492500-ded49ceeb378?auto=format&fit=crop&w=900&q=85" alt="Pull mérinos" />
+                            <img src="carrousel (7).jpeg" alt="Chemise classique" />
+                            <img src="carrousel (8).jpeg" alt="Manteau d'hiver" />
+                        </div>
+                        <!-- Slide 5 -->
+                        <div class="carousel-slide">
+                            <img src="carrousel (9).jpeg" alt="Robe de soirée" />
+                            <img src="carrousel (10).jpeg" alt="Tenue de mariage" />
+                        </div>
+                        <!-- Slide 6 -->
+                        <div class="carousel-slide">
+                            <img src="carrousel (11).jpeg" alt="Accessoires" />
+                            <img src="carrousel (12).jpeg" alt="Style intemporel" />
+                        </div>
+                        <!-- Slide 7 -->
+                        <div class="carousel-slide">
+                            <img src="carrousel (13).jpeg" alt="Collection premium" />
+                            <img src="carrousel (14).jpeg" alt="Élégance masculine" />
+                        </div>
+                        <!-- Slide 8 -->
+                        <div class="carousel-slide">
+                            <img src="carrousel (15).jpeg" alt="Détails raffinés" />
+                            <img src="carrousel (1).jpg" alt="Style parisien" />
                         </div>
                     </div>
                 </div>
@@ -1318,9 +1358,7 @@
                 <!-- Brand media grid -->
                 <div class="brand-media-grid">
                     <figure class="brand-media">
-                        <video autoplay muted loop playsinline poster="https://images.unsplash.com/photo-1598808503746-f34c53b9323e?auto=format&fit=crop&w=900&q=85">
-                            <source src="https://cdn.coverr.co/videos/coverr-a-man-in-a-suit-1572/1080p.mp4" type="video/mp4" />
-                        </video>
+                        <img src="carrousel (5).jpeg" alt="Collection Homme" />
                         <figcaption>
                             <strong>Collection Homme</strong>
                             <span>Costumes, vestes, chemises et accessoires.</span>
@@ -1328,7 +1366,7 @@
                         </figcaption>
                     </figure>
                     <figure class="brand-media">
-                        <img src="https://images.unsplash.com/photo-1566174053879-31528523f8ae?auto=format&fit=crop&w=900&q=85" alt="Robe de soirée élégante" />
+                        <img src="carrousel (9).jpeg" alt="Collection Femme" />
                         <figcaption>
                             <strong>Collection Femme</strong>
                             <span>Robes de soirée et silhouettes raffinées.</span>
@@ -1336,7 +1374,7 @@
                         </figcaption>
                     </figure>
                     <figure class="brand-media">
-                        <img src="https://images.unsplash.com/photo-1519657337289-077653f724ed?auto=format&fit=crop&w=900&q=85" alt="Robe de mariage élégante" />
+                        <img src="MARIAGE/mariage (1).jpeg" alt="Collection Mariage" />
                         <figcaption>
                             <strong>Mariage</strong>
                             <span>Des tenues pensées pour les moments précieux.</span>
@@ -1344,9 +1382,7 @@
                         </figcaption>
                     </figure>
                     <figure class="brand-media">
-                        <video autoplay muted loop playsinline poster="https://images.unsplash.com/photo-1617127365659-c47fa864d8bc?auto=format&fit=crop&w=900&q=85">
-                            <source src="https://cdn.coverr.co/videos/coverr-man-putting-on-a-jacket-1573/1080p.mp4" type="video/mp4" />
-                        </video>
+                        <img src="ACCESSOIRES/accessoire (1).jpeg" alt="Accessoires" />
                         <figcaption>
                             <strong>Accessoires</strong>
                             <span>Les détails qui signent une silhouette.</span>
@@ -1416,7 +1452,7 @@
         <section class="section story" id="maison">
             <div class="story-image" role="img" aria-label="Atelier parisien de confection masculine"></div>
             <div class="story-copy">
-                <span class="eyebrow">À Propos</span>
+                <span class="eyebrow">À PROPOS</span>
                 <h2>L'élégance masculine since 2026</h2>
                 <p>DLT Boutique est née d'une passion pour l'élégance masculine et le raffinement à la française. Notre atelier parisien sélectionne avec soin les plus beaux tissus pour créer des pièces uniques qui allient tradition et modernité.</p>
                 <p>Chaque vêtement raconte une histoire. Celle d'un savoir-faire artisanal qui se transmet de génération en génération. Porter DLT, c'est affirmer son style sans jamais le crier, c'est choisir l'essentiel avec goût et distinction.</p>
@@ -1445,7 +1481,10 @@
     <footer id="journal">
         <div class="footer-grid">
             <div>
-                <a class="logo" href="#accueil">D.L.T Boutique</a>
+                <a class="logo" href="#accueil">
+                    <img src="logo.png" alt="D.L.T Boutique" style="height:30px;" />
+                    D.L.T Boutique
+                </a>
                 <p>DLT Boutique est née d'une passion pour l'élégance masculine et le raffinement à la française.</p>
             </div>
             <div>
@@ -1512,7 +1551,7 @@
                 name: 'Costume Parisien',
                 category: 'Costumes',
                 price: 420,
-                image: 'https://images.unsplash.com/photo-1598808503746-f34c53b9323e?auto=format&fit=crop&w=700&q=80',
+                image: 'carrousel (1).jpeg',
                 badge: 'Nouveau',
                 desc: 'Une coupe structurée et un tissu noble pour une silhouette élégante en toute occasion.'
             }, {
@@ -1520,7 +1559,7 @@
                 name: 'Veste Atelier',
                 category: 'Vestes',
                 price: 260,
-                image: 'https://images.unsplash.com/photo-1551488831-00ddcb6c6bd3?auto=format&fit=crop&w=700&q=80',
+                image: 'vestes/veste (1).jpeg',
                 badge: '',
                 desc: 'Une veste contemporaine aux finitions soignées, pensée pour traverser les saisons.'
             }, {
@@ -1528,7 +1567,7 @@
                 name: 'Chemise Blanche',
                 category: 'Chemises',
                 price: 95,
-                image: 'https://images.unsplash.com/photo-1603252109303-2751441dd157?auto=format&fit=crop&w=700&q=80',
+                image: 'CHEMISE/chemise (1).jpeg',
                 badge: '',
                 desc: 'Une chemise essentielle en coton doux, taillée pour une allure nette et naturelle.'
             }, {
@@ -1536,7 +1575,7 @@
                 name: 'Mocassins DLT',
                 category: 'Accessoires',
                 price: 180,
-                image: 'https://images.unsplash.com/photo-1614252369475-531eba835eb1?auto=format&fit=crop&w=700&q=80',
+                image: 'ACCESSOIRES/accessoire (1).jpeg',
                 badge: 'Bestseller',
                 desc: 'Des mocassins en cuir qui ajoutent une note intemporelle à chaque tenue.'
             }, {
@@ -1544,7 +1583,7 @@
                 name: 'Pantalon Signature',
                 category: 'Costumes',
                 price: 155,
-                image: 'https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?auto=format&fit=crop&w=700&q=80',
+                image: 'PANTALON/pantalon (1).jpeg',
                 badge: '',
                 desc: 'Une ligne précise et confortable, conçue pour accompagner les journées les plus longues.'
             }, {
@@ -1552,7 +1591,7 @@
                 name: 'Cravate Soie',
                 category: 'Accessoires',
                 price: 48,
-                image: 'https://images.unsplash.com/photo-1589756823695-278bc923f962?auto=format&fit=crop&w=700&q=80',
+                image: 'ACCESSOIRES/accessoire (2).jpeg',
                 badge: '',
                 desc: 'Une cravate en soie aux motifs discrets pour signer une tenue avec distinction.'
             }, {
@@ -1560,7 +1599,7 @@
                 name: 'Manteau Héritage',
                 category: 'Vestes',
                 price: 380,
-                image: 'https://images.unsplash.com/photo-1539533018447-63fcce2678e3?auto=format&fit=crop&w=700&q=80',
+                image: 'vestes/veste (2).jpeg',
                 badge: '',
                 desc: 'Un manteau chaud et raffiné inspiré du vestiaire parisien traditionnel.'
             }, {
@@ -1568,7 +1607,7 @@
                 name: 'Pull Mérinos',
                 category: 'Chemises',
                 price: 130,
-                image: 'https://images.unsplash.com/photo-1610652492500-ded49ceeb378?auto=format&fit=crop&w=700&q=80',
+                image: 'CHEMISE/chemise (2).jpeg',
                 badge: 'Nouveau',
                 desc: 'Une maille fine en mérinos pour une allure sobre, confortable et durable.'
             }, {
@@ -1576,7 +1615,7 @@
                 name: 'Robe Nuit Paris',
                 category: 'Robes de soirée',
                 price: 290,
-                image: 'https://images.unsplash.com/photo-1566174053879-31528523f8ae?auto=format&fit=crop&w=700&q=80',
+                image: 'carrousel (9).jpeg',
                 badge: 'Édition femme',
                 desc: 'Une robe de soirée fluide et élégante pour les silhouettes qui aiment briller.'
             }, {
@@ -1584,7 +1623,7 @@
                 name: 'Robe Mariage Ivoire',
                 category: 'Mariage',
                 price: 520,
-                image: 'https://images.unsplash.com/photo-1519657337289-077653f724ed?auto=format&fit=crop&w=700&q=80',
+                image: 'MARIAGE/mariage (1).jpeg',
                 badge: 'Mariage',
                 desc: 'Une création délicate pensée pour accompagner les instants les plus précieux.'
             }, {
@@ -1592,7 +1631,7 @@
                 name: 'Ensemble Cérémonie',
                 category: 'Mariage',
                 price: 340,
-                image: 'https://images.unsplash.com/photo-1594552072238-5c9a6f2d0b9a?auto=format&fit=crop&w=700&q=80',
+                image: 'MARIAGE/mariage (2).jpeg',
                 badge: '',
                 desc: 'Une tenue de cérémonie raffinée pour homme ou femme, dans des matières nobles.'
             }];
@@ -1622,18 +1661,6 @@
 
             // ----- HELPERS -----
             const money = value => value.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' });
-
-            // ----- VIDEO FALLBACK -----
-            document.querySelectorAll('.brand-media video').forEach((video, index) => {
-                const source = video.querySelector('source');
-                if (index === 0) {
-                    source.src = 'https://videos.pexels.com/video-files/853800/853800-hd_1920_1080_30fps.mp4';
-                } else {
-                    source.src = 'https://videos.pexels.com/video-files/853801/853801-hd_1920_1080_30fps.mp4';
-                }
-                video.load();
-                video.play().catch(() => {});
-            });
 
             // ----- CAROUSEL -----
             function goToSlide(index) {
@@ -1726,7 +1753,7 @@
                 cartTotal.textContent = money(total);
 
                 if (!cart.length) {
-                    cartItems.innerHTML = '<div class="empty">Votre panier est encore vide.<br />Il n’attend que de belles choses.</div>';
+                    cartItems.innerHTML = '<div class="empty">Votre panier est encore vide.<br />Il n\'attend que de belles choses.</div>';
                 } else {
                     cartItems.innerHTML = cart.map(item => `
                             <div class="cart-item">
