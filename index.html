@@ -1640,96 +1640,30 @@
         (function() {
             'use strict';
 
-            // ----- DATA avec chemins CORRECTS -----
-            const products = [{
-                id: 1,
-                name: 'Costume Parisien',
-                category: 'Costumes',
-                price: 420,
-                image: 'carrousel (1).jpeg',
-                badge: 'Nouveau',
-                desc: 'Une coupe structurée et un tissu noble pour une silhouette élégante en toute occasion.'
-            }, {
-                id: 2,
-                name: 'Veste Atelier',
-                category: 'Vestes',
-                price: 260,
-                image: 'vestes/veste (1).jpeg',
-                badge: '',
-                desc: 'Une veste contemporaine aux finitions soignées, pensée pour traverser les saisons.'
-            }, {
-                id: 3,
-                name: 'Chemise Blanche',
-                category: 'Chemises',
-                price: 95,
-                image: 'CHEMISE/chemise (1).jpeg',
-                badge: '',
-                desc: 'Une chemise essentielle en coton doux, taillée pour une allure nette et naturelle.'
-            }, {
-                id: 4,
-                name: 'Mocassins DLT',
-                category: 'Accessoires',
-                price: 180,
-                image: 'ACCESSOIRES/accessoire (1).jpeg',
-                badge: 'Bestseller',
-                desc: 'Des mocassins en cuir qui ajoutent une note intemporelle à chaque tenue.'
-            }, {
-                id: 5,
-                name: 'Pantalon Signature',
-                category: 'PANTALON',
-                price: 155,
-                image: 'PANTALON/pantalon (1).jpeg',
-                badge: '',
-                desc: 'Une ligne précise et confortable, conçue pour accompagner les journées les plus longues.'
-            }, {
-                id: 6,
-                name: 'Cravate Soie',
-                category: 'Accessoires',
-                price: 48,
-                image: 'ACCESSOIRES/accessoire (2).jpeg',
-                badge: '',
-                desc: 'Une cravate en soie aux motifs discrets pour signer une tenue avec distinction.'
-            }, {
-                id: 7,
-                name: 'Manteau Héritage',
-                category: 'Vestes',
-                price: 380,
-                image: 'vestes/veste (2).jpeg',
-                badge: '',
-                desc: 'Un manteau chaud et raffiné inspiré du vestiaire parisien traditionnel.'
-            }, {
-                id: 8,
-                name: 'Pull Mérinos',
-                category: 'Chemises',
-                price: 130,
-                image: 'CHEMISE/chemise (2).jpeg',
-                badge: 'Nouveau',
-                desc: 'Une maille fine en mérinos pour une allure sobre, confortable et durable.'
-            }, {
-                id: 9,
-                name: 'Robe Nuit Paris',
-                category: 'Robes de soirée',
-                price: 290,
-                image: 'carrousel (9).jpeg',
-                badge: 'Édition femme',
-                desc: 'Une robe de soirée fluide et élégante pour les silhouettes qui aiment briller.'
-            }, {
-                id: 10,
-                name: 'Robe Mariage Ivoire',
-                category: 'Mariage',
-                price: 520,
-                image: 'MARIAGE/mariage (1).jpeg',
-                badge: 'Mariage',
-                desc: 'Une création délicate pensée pour accompagner les instants les plus précieux.'
-            }, {
-                id: 11,
-                name: 'Ensemble Cérémonie',
-                category: 'Mariage',
-                price: 340,
-                image: 'MARIAGE/mariage (2).jpeg',
-                badge: '',
-                desc: 'Une tenue de cérémonie raffinée pour homme ou femme, dans des matières nobles.'
-            }];
+            // ----- API URL Render (backend service) -----
+            const API_URL = 'https://dlt-boutique.onrender.com/api/products';
+
+            // ----- DATA FETCHED FROM RENDER SERVICE -----
+            let products = [];
+
+            async function loadProducts() {
+                try {
+                    const response = await fetch(API_URL);
+                    if (!response.ok) {
+                        throw new Error(`API unavailable: ${response.status}`);
+                    }
+                    const payload = await response.json();
+                    products = Array.isArray(payload.products) ? payload.products : [];
+                    if (!products.length) {
+                        console.warn('No products returned by Render API');
+                    }
+                    renderProducts();
+                    renderCart();
+                } catch (error) {
+                    console.error(error);
+                    grid.innerHTML = '<p class="empty">La boutique est temporairement indisponible. Veuillez réessayer plus tard.</p>';
+                }
+            }
 
             // ----- STATE -----
             let activeFilter = 'Tous';
@@ -2074,8 +2008,7 @@
             });
 
             // ----- INIT -----
-            renderProducts();
-            renderCart();
+            loadProducts();
         })();
     </script>
 
