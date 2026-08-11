@@ -1,0 +1,59 @@
+{
+  "products": [
+    {
+      "id": 1,
+      "name": "Costume Parisien",
+      "category": "Costumes",
+      "price": 420,
+      "image": "carrousel (1).jpeg",
+      "badge": "Nouveau",
+      "promotion": "0",
+      "comment": "Collection signature",
+      "desc": "Une coupe structurée et un tissu noble pour une silhouette élégante en toute occasion."
+    },
+    {
+      "id": 2,
+      "name": "Veste Atelier",
+      "category": "Vestes",
+      "price": 260,
+      "image": "vestes/veste (1).jpeg",
+      "badge": "",
+      "promotion": "0",
+      "comment": "Veste élégante",
+      "desc": "Une veste contemporaine aux finitions soignées, pensée pour traverser les saisons."
+    },
+    {
+      "id": 3,
+      "name": "Chemise Blanche",
+      "category": "Chemises",
+      "price": 95,
+      "image": "CHEMISE/chemise (1).jpeg",
+      "badge": "",
+      "promotion": "0",
+      "comment": "Chemise premium",
+      "desc": "Une chemise essentielle en coton doux, taillée pour une allure nette et naturelle."
+    },
+    {
+      "id": 4,
+      "name": "Mocassins DLT",
+      "category": "Accessoires",
+      "price": 180,
+      "image": "ACCESSOIRES/accessoire (1).jpeg",
+      "badge": "Bestseller",
+      "promotion": "10",
+      "comment": "Accessoire tendance",
+      "desc": "Des mocassins en cuir qui ajoutent une note intemporelle à chaque tenue."
+    },
+    {
+      "id": 5,
+      "name": "Pantalon Signature",
+      "category": "PANTALON",
+      "price": 155,
+      "image": "PANTALON/pantalon (1).jpeg",
+      "badge": "",
+      "promotion": "0",
+      "comment": "Pantalon tendance",
+      "desc": "Une ligne précise et confortable, conçue pour accompagner les journées les plus longues."
+    }
+  ]
+}
