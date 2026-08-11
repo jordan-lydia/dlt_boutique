@@ -1,0 +1,12 @@
+{
+  "name": "dlt-boutique",
+  "version": "1.0.0",
+  "description": "DLT Boutique static website with Render-ready API",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": ["boutique", "render", "static-site"],
+  "license": "UNLICENSED"
+}
